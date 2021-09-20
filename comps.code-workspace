@@ -5,6 +5,10 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "/Users/rodell/miniconda3/envs/comps/bin/python"
+		"python.pythonPath": "/Users/rodell/miniconda3/envs/comps/bin/python",
+		"cSpell.words": [
+			"sfire",
+			"wrfrun"
+		]
 	}
 }

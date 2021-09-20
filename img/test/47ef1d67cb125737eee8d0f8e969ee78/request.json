@@ -1,0 +1,8 @@
+{
+    "headers": {
+        "User-Agent": "sentinelhub-py/v3.3.1"
+    },
+    "payload": null,
+    "timestamp": "2021-06-25T15:07:25.901637",
+    "url": "https://creodias.sentinel-hub.com/ogc/wms/defd2d19-4f81-4301-ad8b-fd761058f355?SERVICE=wms&WARNINGS=False&MAXCC=100.0&BBOX=336524.0%2C6174820.0%2C340519.0%2C6184815.0&FORMAT=image%2Ftiff&CRS=EPSG%3A32612&TIME=2021-06-23T18%3A18%3A14Z%2F2021-06-23T18%3A18%3A14Z&WIDTH=512&HEIGHT=856&LAYERS=BLAH&REQUEST=GetMap&VERSION=1.3.0"
+}

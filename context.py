@@ -19,7 +19,9 @@ if this_dir.name == "python":
 else:
     notebooks_dir = this_dir
 root_dir = notebooks_dir.parent
-data_dir = root_dir / Path("data")
+
+save_dir = root_dir / Path("img")
+data_dir = Path("/Volumes/cer/comps/data")
 
 
 sys.path.insert(0, str(root_dir))

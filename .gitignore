@@ -8,6 +8,7 @@ __pycache__/
 
 # my docs
 phd-docs/
+data/
 # Distribution / packaging
 .Python
 build/
