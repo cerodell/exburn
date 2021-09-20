@@ -9,6 +9,8 @@ __pycache__/
 # my docs
 phd-docs/
 data/
+.DS_Store
+
 # Distribution / packaging
 .Python
 build/
