@@ -69,27 +69,22 @@ np.savetxt(
 # %%
 # Part IIa: create a fuel mask -----------------------------------
 # create a spatial grid
+
 gridx, gridy = np.meshgrid(
     np.arange(0, ds * ndx, int(ds / fs)), np.arange(0, ds * ndy, int(ds / fs))
-)  # this essentially corresponds to XLONG and XLAT vars in idealizad simulations
-
-# gridx, gridy = np.meshgrid(np.arange(0,ds*ndx,int(ds)), np.arange(0,ds*ndy,int(ds)))      #this essentially corresponds to XLONG and XLAT vars in idealizad simulations
-
-# georeference the grid
+)
 UTMx = (
     gridx + ll_utm[0]
 )  # now adding a georefernce we have UTM grid (technically UTM_12N, or EPSG:26912)
 UTMy = gridy + ll_utm[1]
-
 ## transform into the same projection (for shapefiles and for basemaps)
 wgs84 = pyproj.Proj("+init=EPSG:4326")
 epsg26912 = pyproj.Proj("+init=EPSG:26912")
 WGSx, WGSy = pyproj.transform(
     epsg26912, wgs84, UTMx.ravel(), UTMy.ravel()
 )  # reproject from UTM to WGS84
-
-
 XLONG, XLAT = np.reshape(WGSx, np.shape(UTMx)), np.reshape(WGSy, np.shape(UTMy))
+
 
 # print('.. configuring a map')
 # bm = Basemap(llcrnrlon=XLONG[0,0], llcrnrlat=XLAT[0,0],\
@@ -153,10 +148,10 @@ except:
     da = xr.DataArray(
         name="fuel",
         data=fuel,
-        dims=["XLONG", "XLAT"],
+        dims=["XLAT", "XLONG"],
         coords=dict(
-            lon=(["XLONG", "XLAT"], XLONG),
-            lat=(["XLONG", "XLAT"], XLAT),
+            lon=(["XLAT", "XLONG"], XLONG),
+            lat=(["XLAT", "XLONG"], XLAT),
         ),
         attrs=dict(
             description="WRF-SFIRE FUELS MAP.",

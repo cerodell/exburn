@@ -18,6 +18,8 @@ this_dir = path.parent  # this folder
 notebooks_dir = this_dir
 root_dir = notebooks_dir.parents[0]
 save_dir = root_dir / Path("img")
+img_dir = root_dir / Path("img")
+
 data_dir = root_dir / Path("data")
 vol_dir = Path("/Volumes/cer/comps")
 gog_dir = Path(
