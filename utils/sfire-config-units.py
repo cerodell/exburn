@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib import path
 from mpl_toolkits.basemap import Basemap
 import pyproj as pyproj
+from pathlib import Path
 from netCDF4 import Dataset
 import pandas as pd
 import xarray as xr
@@ -18,7 +19,7 @@ import zarr
 import geopandas as gpd
 from sklearn.neighbors import KDTree
 import wrf
-from context import gog_dir, data_dir, met_dir, root_dir
+from context import  data_dir, root_dir, met_dir
 import pickle
 from wrf import getvar
 
@@ -30,19 +31,20 @@ ndx = 160  # EW number of grids
 ndy = 400  # NS number of grids
 t2 = 290  # surface temperature
 buff = 30  # buffer size (ie firebreaks) around units
-anderson = 10  # anderson fuels type
+fueltype = 7  # anderson fuels type
 ig_start = [55.7177788, -113.571244]
 ig_end = [55.7177788, -113.575172]
 sw = [55.717153, -113.57668]
 ne = [55.720270, -113.569517]
-fireshape_path = str(gog_dir) + "/all_units/mygeodata_merged"
+fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
 
+save_dir = Path(str(data_dir) + f"/fuel{fueltype}/")
+save_dir.mkdir(parents=True, exist_ok=True)
 
 ll_utm = [
     336524,
     6174820,
 ]  # lower left corner of the domain in UTM coordinates (meters)
-target_fuel = 10  # fuel type within the burn plot
 rxloc = [55, -113]  # lat/lon location of the burn
 rxtime = 14  # anticipated burn hour
 utm = -8  # utm offset
@@ -59,7 +61,7 @@ dim_header = ",".join(
 
 # save output file
 np.savetxt(
-    str(root_dir) + "/data/wrfinput/input_tsk",
+    str(save_dir) + "/input_tsk",
     surface_T,
     header=dim_header,
     comments="",
@@ -99,7 +101,7 @@ bm = Basemap(
 )
 
 try:
-    ds_fuel = xr.open_zarr(str(root_dir) + "/data/zarr/fuels.zarr")
+    ds_fuel = xr.open_zarr(str(save_dir) + f"/fuels-{fueltype}.zarr")
     fuel = ds_fuel.fuel.values
     print("found fuels dataset")
 except:
@@ -123,7 +125,7 @@ except:
     )
 
     # try:
-    fuel = np.full_like(XLONG, anderson)
+    fuel = np.full_like(XLONG, fueltype)
 
     for i in range(len(bm.units)):
         unit = path.Path(bm.units[i])
@@ -143,7 +145,7 @@ except:
             np.array(list(zip(XLONG.ravel(), XLAT.ravel())))
         )
         unit_mask = np.reshape(unit_mask, np.shape(XLONG))
-        fuel[unit_mask] = target_fuel
+        fuel[unit_mask] = fueltype
 
     da = xr.DataArray(
         name="fuel",
@@ -158,12 +160,12 @@ except:
         ),
     )
     ds_fuel = da.to_dataset()
-    ds_fuel.to_zarr(str(root_dir) + "/data/zarr/fuels.zarr", mode="w")
+    ds_fuel.to_zarr(str(save_dir) + f"/fuels-{fueltype}.zarr", mode="w")
 
 
 dim_header_fire = ",".join(map(str, np.shape(fuel.T)))
 np.savetxt(
-    str(root_dir) + "/data/wrfinput/input_fc",
+    str(save_dir) + "/input_fc",
     fuel.T,
     header=dim_header_fire,
     comments="",
@@ -171,13 +173,13 @@ np.savetxt(
 )
 
 # sanity-check plot
-plt.figure(figsize=(10, 8))
-# bm.contourf(XLONG, XLAT,fuel)
-xx, yy = np.meshgrid(np.arange(0, gridx.shape[1], 1), np.arange(0, gridx.shape[0], 1))
-plt.contourf(xx, yy, fuel)
-# polygons = bm.readshapefile(fireshape_path,name='units',drawbounds=True, color='red')
-plt.colorbar(orientation="horizontal")
-plt.title("ENTIRE LES DOMAIN WITH FIRE PLOT")
+# plt.figure(figsize=(10, 8))
+# # bm.contourf(XLONG, XLAT,fuel)
+# xx, yy = np.meshgrid(np.arange(0, gridx.shape[1], 1), np.arange(0, gridx.shape[0], 1))
+# plt.contourf(xx, yy, fuel)
+# # polygons = bm.readshapefile(fireshape_path,name='units',drawbounds=True, color='red')
+# plt.colorbar(orientation="horizontal")
+# plt.title("ENTIRE LES DOMAIN WITH FIRE PLOT")
 # plt.show()
 
 # %%
@@ -215,38 +217,38 @@ igs = np.unravel_index(int(igs_ind), XLAT.shape)
 ige = np.unravel_index(int(ige_ind), XLAT.shape)
 
 
-# UNIT 4 WESTERLY
-plt.figure(figsize=(10, 8))
-plt.title("CLOSEUP OF THE FIRE PLOT")
-bmX = Basemap(
-    llcrnrlon=XLONG[nsew[1], nsew[3]],
-    llcrnrlat=XLAT[nsew[1], nsew[3]],
-    urcrnrlon=XLONG[nsew[0], nsew[2]],
-    urcrnrlat=XLAT[nsew[0], nsew[2]],
-    epsg=4326,
-)
-polygonsX = bmX.readshapefile(
-    fireshape_path, name="units", drawbounds=True, color="red"
-)
+# # UNIT 4 WESTERLY
+# plt.figure(figsize=(10, 8))
+# plt.title("CLOSEUP OF THE FIRE PLOT")
+# bmX = Basemap(
+#     llcrnrlon=XLONG[nsew[1], nsew[3]],
+#     llcrnrlat=XLAT[nsew[1], nsew[3]],
+#     urcrnrlon=XLONG[nsew[0], nsew[2]],
+#     urcrnrlat=XLAT[nsew[0], nsew[2]],
+#     epsg=4326,
+# )
+# polygonsX = bmX.readshapefile(
+#     fireshape_path, name="units", drawbounds=True, color="red"
+# )
 
-bmX.contourf(
-    XLONG[nsew[1] : nsew[0], nsew[3] : nsew[2]],
-    XLAT[nsew[1] : nsew[0], nsew[3] : nsew[2]],
-    fuel[nsew[1] : nsew[0], nsew[3] : nsew[2]],
-)
-plt.colorbar(orientation="horizontal", label="fuel category")
-plt.scatter(
-    XLONG[igs[0], igs[1]], XLAT[igs[0], igs[1]], c="red", label="ignition start"
-)
-plt.scatter(
-    XLONG[ige[0], ige[1]],
-    XLAT[ige[0], ige[1]],
-    c="red",
-    marker="*",
-    s=60,
-    label="ignition end",
-)
-plt.legend()
+# bmX.contourf(
+#     XLONG[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+#     XLAT[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+#     fuel[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+# )
+# plt.colorbar(orientation="horizontal", label="fuel category")
+# plt.scatter(
+#     XLONG[igs[0], igs[1]], XLAT[igs[0], igs[1]], c="red", label="ignition start"
+# )
+# plt.scatter(
+#     XLONG[ige[0], ige[1]],
+#     XLAT[ige[0], ige[1]],
+#     c="red",
+#     marker="*",
+#     s=60,
+#     label="ignition end",
+# )
+# plt.legend()
 # plt.show()
 #
 
@@ -379,47 +381,47 @@ P0 = 1000.0  # Units (hPa)
 theta = T * (P0 / P * 10) ** (Rd / cp)
 
 
-# profile plot
-fig, ax = plt.subplots(1, 4, figsize=(16, 10))
-fig.suptitle("input sounding", fontsize=16, fontweight="bold")
-ax[0].set_ylabel("Height (m)", fontsize=14)
-ax[0].set_xlabel("$Temp$ (K)", fontsize=14)
-ax[0].plot(temp, Z, color="red", linewidth=4)
-ax[1].set_xlabel("$Potential Temp$ (K)", fontsize=14)
-ax[1].plot(T, Z, color="purple", linewidth=4)
-ax[2].plot(RH, Z, color="green", linewidth=4)
-ax[2].set_xlabel("RH (%)", fontsize=14)
-wsp = (U ** 2 + V ** 2) ** 0.5
-Xq, Yq = np.meshgrid(np.max(wsp) + 8, Z)
-ax[3].plot(wsp, Z, color="k", linewidth=4)
-ax[3].barbs(Xq, Yq, U, V, color="k", linewidth=2)
-ax[3].set_xlabel("Wsp/Dir (m s-1)", fontsize=14)
-plt.show()
+# # profile plot
+# fig, ax = plt.subplots(1, 4, figsize=(16, 10))
+# fig.suptitle("input sounding", fontsize=16, fontweight="bold")
+# ax[0].set_ylabel("Height (m)", fontsize=14)
+# ax[0].set_xlabel("$Temp$ (K)", fontsize=14)
+# ax[0].plot(temp, Z, color="red", linewidth=4)
+# ax[1].set_xlabel("$Potential Temp$ (K)", fontsize=14)
+# ax[1].plot(T, Z, color="purple", linewidth=4)
+# ax[2].plot(RH, Z, color="green", linewidth=4)
+# ax[2].set_xlabel("RH (%)", fontsize=14)
+# wsp = (U ** 2 + V ** 2) ** 0.5
+# Xq, Yq = np.meshgrid(np.max(wsp) + 8, Z)
+# ax[3].plot(wsp, Z, color="k", linewidth=4)
+# ax[3].barbs(Xq, Yq, U, V, color="k", linewidth=2)
+# ax[3].set_xlabel("Wsp/Dir (m s-1)", fontsize=14)
+# plt.show()
 
 
-# profile plot
-inx = 10
-fig, ax = plt.subplots(1, 4, figsize=(16, 10))
-fig.suptitle("input sounding lower pbl", fontsize=16, fontweight="bold")
-ax[0].set_ylabel("Height (m)", fontsize=14)
-ax[0].set_xlabel("$Temp$ (C)", fontsize=14)
-ax[0].plot(temp[:inx] - 273.15, Z[:inx], color="red", linewidth=4)
-ax[1].plot(T[:inx] - 273.15, Z[:inx], color="purple", linewidth=4)
-ax[1].set_xlabel("$Potential Temp$ (C)", fontsize=14)
-ax[2].plot(RH[:inx], Z[:inx], color="green", linewidth=4)
-ax[2].set_xlabel("RH (%)", fontsize=14)
-wsp = (U[:inx] ** 2 + V[:inx] ** 2) ** 0.5
-Xq, Yq = np.meshgrid(np.max(wsp * (60 * 60 / 1000)) + 4, Z[:inx])
-ax[3].plot(wsp * (60 * 60 / 1000), Z[:inx], color="k", linewidth=4)
-ax[3].barbs(Xq, Yq, U[:inx], V[:inx], color="k", linewidth=2)
-ax[3].set_xlabel("Wsp/Dir (km hr-1)", fontsize=14)
-plt.show()
+# # profile plot
+# inx = 10
+# fig, ax = plt.subplots(1, 4, figsize=(16, 10))
+# fig.suptitle("input sounding lower pbl", fontsize=16, fontweight="bold")
+# ax[0].set_ylabel("Height (m)", fontsize=14)
+# ax[0].set_xlabel("$Temp$ (C)", fontsize=14)
+# ax[0].plot(temp[:inx] - 273.15, Z[:inx], color="red", linewidth=4)
+# ax[1].plot(T[:inx] - 273.15, Z[:inx], color="purple", linewidth=4)
+# ax[1].set_xlabel("$Potential Temp$ (C)", fontsize=14)
+# ax[2].plot(RH[:inx], Z[:inx], color="green", linewidth=4)
+# ax[2].set_xlabel("RH (%)", fontsize=14)
+# wsp = (U[:inx] ** 2 + V[:inx] ** 2) ** 0.5
+# Xq, Yq = np.meshgrid(np.max(wsp * (60 * 60 / 1000)) + 4, Z[:inx])
+# ax[3].plot(wsp * (60 * 60 / 1000), Z[:inx], color="k", linewidth=4)
+# ax[3].barbs(Xq, Yq, U[:inx], V[:inx], color="k", linewidth=2)
+# ax[3].set_xlabel("Wsp/Dir (km hr-1)", fontsize=14)
+# plt.close()
 
 
 # #save sounding data input field
 sounding_header = " ".join(map(str, surface))
 np.savetxt(
-    str(root_dir) + "/data/wrfinput/input_sounding",
+    str(save_dir) + "/input_sounding",
     sounding,
     header=sounding_header,
     comments="",

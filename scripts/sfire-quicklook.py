@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from context import root_dir, vol_dir, data_dir, save_dir
 import matplotlib.pylab as pylab
 
+fueltype = 6
 
 params = {
     "xtick.labelsize": 14,
@@ -25,10 +26,10 @@ pylab.rcParams.update(params)
 # %% [markdown]
 # Open dataset
 # %%
-wrfrun = "/sfire/unit5/moist_false/"
-filein = str(vol_dir) + wrfrun
-save_dir = str(save_dir) + wrfrun
-ds = xr.open_zarr(str(filein) + "/wrfout_unit5.zarr")
+
+save_dir = Path(str(save_dir) + f'/fuel{fueltype}')
+save_dir.mkdir(parents=True, exist_ok=True)
+ds = xr.open_dataset(str(data_dir) + f"/fuel{fueltype}/wrfout_d01_2019-05-11_17:49:11", chunks = 'auto')
 
 # %% [markdown]
 # Plot Heat flux from ground during ignition
@@ -39,21 +40,21 @@ dsi = ds.isel(
     Time=slice(0, 16, 3),
 )
 dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
-dsi.FGRNHFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max")
-plt.savefig(str(save_dir) + "/FGRNHFX_Ignition.png")
+dsi.FLINEINT.plot(col="Time", col_wrap=3, cmap="Reds", extend="max")
+plt.savefig(str(save_dir) + "/FLINEINT_Ignition.png")
 
 
 # %% [markdown]
 # Plot Heat flux from ground fire every min for first 20 mins
 # %%
 dsi = ds.isel(
-    south_north_subgrid=slice(550, 620),
-    west_east_subgrid=slice(330, 405),
+    south_north=slice(110, 160),
+    west_east=slice(60, 85),
     Time=slice(0, 168, 6),
 )
 dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
-dsi.FGRNHFX.plot(col="Time", col_wrap=4, cmap="Reds", extend="max")
-plt.savefig(str(save_dir) + "/FGRNHFX.png")
+dsi.GRNHFX.plot(col="Time", col_wrap=4, cmap="Reds", extend="max")
+plt.savefig(str(save_dir) + "/GRNHFX.png")
 
 
 # %% [markdown]

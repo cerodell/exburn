@@ -15,16 +15,12 @@ from mpl_toolkits.basemap import Basemap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from context import root_dir, vol_dir, data_dir, save_dir, gog_dir
 import matplotlib.pylab as pylab
+from utils.sfire import makeLL
 
 
-wrfrun = "/sfire/unit5/moist_true/"
-filein = str(vol_dir) + wrfrun
-save_dir = str(save_dir) + wrfrun
-int_ds = xr.open_dataset(str(filein) + "/wrfinput_d01")
-FMC_GC = int_ds.FMC_GC
-FMC_G = int_ds.FMC_G
+ds_6 = xr.open_dataset(str(data_dir) + f"/fuel{6}/wrfout_d01_2019-05-11_17:49:11")
+ds_10 = xr.open_dataset(str(data_dir) + f"/fuel{10}/wrfout_d01_2019-05-11_17:49:11")
 
-wrfrun = "/sfire/unit5/moist_false/"
-filein = str(vol_dir) + wrfrun
-save_dir = str(save_dir) + wrfrun
-old_ds = xr.open_zarr(str(filein) + "/wrfout_unit5.zarr")
+
+FGRNHFX6 = ds_6.FGRNHFX.isel(Time = 100).values
+FGRNHFX10 = ds_10.FGRNHFX.isel(Time = 100).values
