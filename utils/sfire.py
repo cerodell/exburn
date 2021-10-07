@@ -7,7 +7,9 @@ from pathlib import Path
 import pyproj as pyproj
 from datetime import datetime
 from context import data_dir
+import warnings
 
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def compressor(ds):
@@ -19,9 +21,10 @@ def compressor(ds):
     return ds, encoding
 
 
-
 def sovle_pbl(fueltype):
-    ds = xr.open_dataset(str(data_dir) + f"/fuel{fueltype}/interp-unit5-theta_e.nc", chunks = 'auto')
+    ds = xr.open_dataset(
+        str(data_dir) + f"/fuel{fueltype}/interp-unit5-theta_e.nc", chunks="auto"
+    )
 
     ## get vertical levels and coverert to meters
     interp_level = ds.interp_level.values * 1000
@@ -29,23 +32,25 @@ def sovle_pbl(fueltype):
     levelup = 30
     ## solve for PBL height
     end = len(interp_level) - levelup
-    print(f'Bottom level {interp_level[levelup]}')
+    print(f"Bottom level {interp_level[levelup]}")
     # theta_e = ds.theta_e.isel(interp_level = slice(levelup,None), Time = slice(20,24), south_north = slice(10,15), west_east= slice(10,15))
-    theta_e = ds.theta_e.isel(interp_level = slice(levelup,None))
+    theta_e = ds.theta_e.isel(interp_level=slice(levelup, None))
     XLAT = theta_e.XLAT.values
     chunk = theta_e.chunks
 
     print("Solve Temp Gradient: ", datetime.now())
     statTIME = datetime.now()
     levels = theta_e.interp_level.values * 1000
-    del theta_e['interp_level']
-    zi = theta_e.isel(interp_level = slice(1,end))
-    zii = theta_e.isel(interp_level = slice(0,end-1))
+    del theta_e["interp_level"]
+    zi = theta_e.isel(interp_level=slice(1, end))
+    zii = theta_e.isel(interp_level=slice(0, end - 1))
 
     # dask.config.set({"array.slicing.split_large_chunks": False})
-    gradTLES = (zi - zii)/zstep
+    gradTLES = (zi - zii) / zstep
     end = len(gradTLES.interp_level)
-    gradT2 = (gradTLES.isel(interp_level = slice(1,end)) - gradTLES.isel(interp_level = slice(0,end-1))) 
+    gradT2 = gradTLES.isel(interp_level=slice(1, end)) - gradTLES.isel(
+        interp_level=slice(0, end - 1)
+    )
     print("Temp Gradient Solved: ", datetime.now() - statTIME)
 
     print("Computing: ", datetime.now())
@@ -56,33 +61,33 @@ def sovle_pbl(fueltype):
     print("Build Height: ", datetime.now())
     statTIME = datetime.now()
     try:
-        height = xr.open_dataarray(str(data_dir) + '/height.nc',mode = 'w')
+        height = xr.open_dataarray(str(data_dir) + "/height.nc", mode="w")
     except:
         height = xr.DataArray(
-            np.stack([[np.full_like(XLAT, level) for level in levels]]* len(theta_e.Time)),
-            name='PBLH',
-            dims=('Time', 'interp_level', "south_north", "west_east"),
+            np.stack(
+                [[np.full_like(XLAT, level) for level in levels]] * len(theta_e.Time)
+            ),
+            name="PBLH",
+            dims=("Time", "interp_level", "south_north", "west_east"),
         ).chunk(chunk)
-        height.to_netcdf(str(data_dir) + '/height.nc',mode = 'w')
+        height.to_netcdf(str(data_dir) + "/height.nc", mode="w")
 
     print("Height Built: ", datetime.now() - statTIME)
 
     print("Index Height: ", datetime.now())
     statTIME = datetime.now()
-    PBLH = height.isel(gradT2.argmax(dim=['interp_level']))
+    PBLH = height.isel(gradT2.argmax(dim=["interp_level"]))
     print("Height Indexed: ", datetime.now() - statTIME)
 
     XLAT, XLONG = makeLL()
     PBLH = PBLH.to_dataset()
-    PBLH['XLAT'] = XLAT
-    PBLH['XLONG'] = XLONG
+    PBLH["XLAT"] = XLAT
+    PBLH["XLONG"] = XLONG
 
     print("Write PBLH: ", datetime.now())
     statTIME = datetime.now()
     PBLH, encoding = compressor(PBLH)
-    PBLH.to_netcdf(str(data_dir) + '/PBLH.nc',
-                encoding = encoding,
-                mode = 'w')
+    PBLH.to_netcdf(str(data_dir) + "/PBLH.nc", encoding=encoding, mode="w")
     print("Write Time: ", datetime.now() - statTIME)
     return PBLH
 
@@ -98,7 +103,7 @@ def makeLL(domain):
     ]  # lower left corner of the domain in UTM coordinates (meters)
     # ============ end of INPUTS==============
     ## create grid WRF LAT/LONG with defined inputs
-    if domain == 'met':
+    if domain == "met":
         gridx, gridy = np.meshgrid(
             np.arange(0, ds * ndx, int(ds)), np.arange(0, ds * ndy, int(ds))
         )
@@ -125,7 +130,7 @@ def makeLL(domain):
             data=XLONG,
             dims=["south_north", "west_east"],
         )
-    elif domain == 'fire':
+    elif domain == "fire":
         ## create grid FIRE LAT/LONG with defined inputs
         fire_gridx, fire_gridy = np.meshgrid(
             np.arange(0, ds * ndx, int(ds / fs)), np.arange(0, ds * ndy, int(ds / fs))
@@ -162,7 +167,7 @@ def makeLL(domain):
             name="XLONG",
             data=fire_XLONG,
             dims=["south_north_subgrid", "west_east_subgrid"],
-        )        
+        )
     else:
-        raise ValueError('Invalid domain option')
+        raise ValueError("Invalid domain option")
     return XLAT, XLONG

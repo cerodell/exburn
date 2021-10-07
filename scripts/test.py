@@ -18,9 +18,7 @@ import matplotlib.pylab as pylab
 from utils.sfire import makeLL
 
 
-ds_6 = xr.open_dataset(str(data_dir) + f"/fuel{6}/wrfout_d01_2019-05-11_17:49:11")
 ds_10 = xr.open_dataset(str(data_dir) + f"/fuel{10}/wrfout_d01_2019-05-11_17:49:11")
 
 
-FGRNHFX6 = ds_6.FGRNHFX.isel(Time = 100).values
-FGRNHFX10 = ds_10.FGRNHFX.isel(Time = 100).values
+FGRNHFX10 = ds_10.FGRNHFX.isel(Time=100).values
