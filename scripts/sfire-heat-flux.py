@@ -92,7 +92,6 @@ def find_index(hf):
     print(hf)
     hf = np.array([hfs[hf]["lat"], hfs[hf]["lon"]]).reshape(1, -1)
     hf_dist, hf_ind = fire_tree.query(hf, k=1)
-
     print(hf_dist)
     hf_loc = list(np.unravel_index(int(hf_ind), XLAT.shape))
     return hf_loc

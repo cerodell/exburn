@@ -37,17 +37,51 @@ ds = xr.open_dataset(
 )
 
 # %% [markdown]
-# Plot Heat flux from ground during ignition
+# Plot Gound Heat flux
 # %%
 dsi = ds.isel(
     south_north_subgrid=slice(550, 620),
     west_east_subgrid=slice(330, 405),
-    Time=slice(0, 100, 1),
+    Time=slice(0, 44, 1),
 )
 dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
 dsi.FGRNHFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
 plt.savefig(str(save_dir) + "/FGRNHFX.png")
 
+# %% [markdown]
+# Plot Fire Area
+# %%
+dsi.FIRE_AREA.plot(
+    col="Time", col_wrap=3, cmap="gist_heat_r", extend="max", aspect=2, size=3
+)
+plt.savefig(str(save_dir) + "/FIRE_AREA.png")
+
+# # %% [markdown]
+# # Plot Observed Fire Heat Flux
+# # %%
+# dsi.FIRE_HFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
+# plt.savefig(str(save_dir) + "/FIRE_HFX.png")
+
+# %% [markdown]
+# Plot Fuel Fraction
+# %%
+dsi.FUEL_FRAC.plot(
+    col="Time", col_wrap=3, cmap="summer_r", extend="max", aspect=2, size=3
+)
+plt.savefig(str(save_dir) + "/FUEL_FRAC.png")
+
+
+# %% [markdown]
+# Plot Rate of Spread
+# %%
+dsi.ROS.plot(col="Time", col_wrap=3, cmap="Purples", extend="max", aspect=2, size=3)
+plt.savefig(str(save_dir) + "/ROS.png")
+
+# %% [markdown]
+# Plot Fireline Intensity
+# %%
+dsi.FLINEINT.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
+plt.savefig(str(save_dir) + "/FLINEINT.png")
 
 # %% [markdown]
 # Plot Heat flux from ground fire every min for first 20 mins

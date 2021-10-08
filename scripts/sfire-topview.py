@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 from context import root_dir, data_dir, save_dir
 import matplotlib.pylab as pylab
+import matplotlib.colors as colors
 from utils.sfire import makeLL
 
 
@@ -35,9 +36,10 @@ save_dir = Path(str(save_dir) + f"/fuel{fueltype}/")
 save_dir.mkdir(parents=True, exist_ok=True)
 
 
-with open(str(data_dir) + "/json/config.json") as f:
+with open(str(root_dir) + "/json/config.json") as f:
     config = json.load(f)
 aqs = config["unit5"]["obs"]["aq"]
+ros = config["unit5"]["obs"]["ros"]
 
 wrf_ds = xr.open_dataset(
     str(data_dir) + f"/fuel{fueltype}/wrfout_d01_2019-05-11_17:49:11", chunks="auto"
@@ -67,7 +69,7 @@ dimT = len(var_ds.Time)
 
 
 fig = plt.figure(figsize=(10, 6))
-ax = fig.add_subplot(1, 1, 1)  # top and bottom left
+ax = fig.add_subplot(1, 1, 1)
 bm = Basemap(
     llcrnrlon=XLONG[0, 0],
     llcrnrlat=XLAT[0, 0],
@@ -77,11 +79,7 @@ bm = Basemap(
     ax=ax,
 )
 polygons = bm.readshapefile(fireshape_path, name="units", drawbounds=True, zorder=9)
-ax.scatter(aqs["303-100"]["lon"], aqs["303-100"]["lat"], zorder=10)
-ax.scatter(aqs["303-200"]["lon"], aqs["303-200"]["lat"], zorder=10)
-ax.scatter(aqs["303-300"]["lon"], aqs["303-300"]["lat"], zorder=10)
-ax.scatter(aqs["401-100"]["lon"], aqs["401-100"]["lat"], zorder=10)
-ax.scatter(aqs["401-200"]["lon"], aqs["401-200"]["lat"], zorder=10)
+[ax.scatter(aqs[s]["lon"], aqs[s]["lat"], zorder=10) for s in aqs]
 ds = var_ds.isel(Time=0)
 ax.set_title(f"{title} \n" + ds.Time.values.astype(str)[:-10], fontsize=18)
 contour = ax.contourf(
