@@ -27,12 +27,20 @@ interpz[0] = 2
 interpz = np.insert(interpz, 1, 10)
 XLAT, XLONG = makeLL("met")
 
+
 ## list of variables to interpolate.
 # get_vars   = ["tr17_1", 'QVAPOR', "temp", "td", "theta_e", "rh", "ua", "va", "wa", "pressure"]
 
-get_vars = ["tr17_1", "temp", "ua", "va"]
+get_vars = ["theta_e"]
 
 ncfile = Dataset(str(data_dir) + f"/fuel{fueltype}/wrfout_d01_2019-05-11_17:49:11")
+
+
+height_agl = wrf.getvar(ncfile, "height_agl")
+height_agl.values[:, 0, 0]
+height = wrf.getvar(ncfile, "zstag")
+height.values[:, 0, 0]
+#
 startCache = datetime.now()
 my_cache = wrf.extract_vars(
     ncfile, wrf.ALL_TIMES, ("P", "PSFC", "PB", "PH", "PHB", "T", "QVAPOR", "HGT")

@@ -32,7 +32,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 domain = "fire"
 unit = "unit5"
 modelrun = "F6V51M08R24"
-configid = modelrun[:-6]
 title = "Time of Arrival"
 # units = "degrees C"
 var = "FGRNHFX"
@@ -41,14 +40,13 @@ Cnorm = colors.Normalize(vmin=0, vmax=200)
 ros_filein = str(data_dir) + "/obs/ros/"
 fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
 headers = ["day", "hour", "minute", "second", "temp"]
-save_dir = Path(str(save_dir) + f"/{modelrun}/")
-save_dir.mkdir(parents=True, exist_ok=True)
+
 
 with open(str(root_dir) + "/json/config.json") as f:
     config = json.load(f)
 ros = config["unit5"]["obs"]["ros"]
 ros_ids = list(ros)
-bounds = config["unit5"]["sfire"][configid]
+bounds = config["unit5"]["sfire"][modelrun]
 south_north_subgrid = slice(bounds["fire"]["sn"][0], bounds["fire"]["sn"][1])
 west_east_subgrid = slice(bounds["fire"]["we"][0], bounds["fire"]["we"][1])
 fs = bounds["namelist"]["dxy"] / bounds["namelist"]["fs"]
@@ -65,7 +63,7 @@ var_da = var_da.sel(
 )
 times = var_da.XTIME.values
 
-XLAT, XLONG = makeLL(domain, configid)
+XLAT, XLONG = makeLL(domain, modelrun)
 XLAT = XLAT.sel(
     south_north_subgrid=south_north_subgrid, west_east_subgrid=west_east_subgrid
 )
@@ -98,12 +96,15 @@ def prepare_df(rosin):
     upsampled = df.resample("1S")
     df = upsampled.interpolate(method="linear")
     df = df[str(times[0]) : str(times[-1])]
-    df["DateTime"] = pd.to_datetime(df.index)
+    df = df.rename(columns={"temp": f"temp-{rosin}"})
+    # df["DateTime"] = pd.to_datetime(df.index)
     return df
 
 
 ros_dfs = [prepare_df(s) for s in ros]
-dimT = len(ros_dfs[0])
+ros_dfs = pd.concat(ros_dfs, axis=1)
+
+dimT = len(ros_dfs)
 
 
 def find_index(s):
@@ -222,7 +223,7 @@ def plotstuff(i):
 
 
 [plotstuff(i) for i in range(len(cols))]
-plt.savefig(str(save_dir) + f"/ros-timeseries.png", dpi=300)
+plt.savefig(str(save_dir) + f"/{modelrun}/ros-timeseries.png", dpi=300)
 
 
 # fig = plt.figure(figsize=(6, 4))

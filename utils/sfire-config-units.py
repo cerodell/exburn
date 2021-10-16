@@ -19,24 +19,12 @@ import zarr
 import geopandas as gpd
 from sklearn.neighbors import KDTree
 import wrf
-from context import  data_dir, root_dir, met_dir
+from context import data_dir, root_dir, met_dir
 import pickle
 from wrf import getvar
 
 # %%
-# ============ INPUTS==============
-ds = 25  # LES grid spacing
-fs = 5  # fire mesh ratio
-ndx = 160  # EW number of grids
-ndy = 400  # NS number of grids
-t2 = 290  # surface temperature
-buff = 30  # buffer size (ie firebreaks) around units
-fueltype = 7  # anderson fuels type
-ig_start = [55.7177788, -113.571244]
-ig_end = [55.7177788, -113.575172]
-sw = [55.717153, -113.57668]
-ne = [55.720270, -113.569517]
-fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
+
 
 save_dir = Path(str(data_dir) + f"/fuel{fueltype}/")
 save_dir.mkdir(parents=True, exist_ok=True)
@@ -101,7 +89,7 @@ bm = Basemap(
 )
 
 try:
-    ds_fuel = xr.open_zarr(str(save_dir) + f"/fuels-{fueltype}.zarr")
+    ds_fuel = xr.open_zarr(str(save_dir) + f"/fuels-{fueltype}-.zarr")
     fuel = ds_fuel.fuel.values
     print("found fuels dataset")
 except:
@@ -173,21 +161,21 @@ np.savetxt(
 )
 
 # sanity-check plot
-# plt.figure(figsize=(10, 8))
-# # bm.contourf(XLONG, XLAT,fuel)
-# xx, yy = np.meshgrid(np.arange(0, gridx.shape[1], 1), np.arange(0, gridx.shape[0], 1))
-# plt.contourf(xx, yy, fuel)
-# # polygons = bm.readshapefile(fireshape_path,name='units',drawbounds=True, color='red')
-# plt.colorbar(orientation="horizontal")
-# plt.title("ENTIRE LES DOMAIN WITH FIRE PLOT")
-# plt.show()
+plt.figure(figsize=(10, 8))
+# bm.contourf(XLONG, XLAT,fuel)
+xx, yy = np.meshgrid(np.arange(0, gridx.shape[1], 1), np.arange(0, gridx.shape[0], 1))
+plt.contourf(xx, yy, fuel)
+# polygons = bm.readshapefile(fireshape_path,name='units',drawbounds=True, color='red')
+plt.colorbar(orientation="horizontal")
+plt.title("ENTIRE LES DOMAIN WITH FIRE PLOT")
+plt.show()
 
 # %%
 # Part IIb: locate ignition -----------------------------------
 ## find ignition location on wrf grid based on lat and lon
 try:
     ## try and open kdtree for domain
-    dmtree, dmlocs = pickle.load(open(str(root_dir) + f"/data/tree/dmtree.p", "rb"))
+    dmtree, dmlocs = pickle.load(open(str(root_dir) + f"/data/tree/dmtree-.p", "rb"))
     print("Found Domain Tree")
 except:
     ## build a kd-tree for fwf domain if not found

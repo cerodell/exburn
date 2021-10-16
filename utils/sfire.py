@@ -1,15 +1,19 @@
 import context
 import dask
+import json
 import numpy as np
 import pandas as pd
 import xarray as xr
 from pathlib import Path
 import pyproj as pyproj
 from datetime import datetime
-from context import data_dir
+from context import data_dir, root_dir
 import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
+
+with open(str(root_dir) + "/json/config.json") as f:
+    config = json.load(f)
 
 
 def compressor(ds):
@@ -92,14 +96,15 @@ def sovle_pbl(fueltype):
     return PBLH
 
 
-def makeLL(domain):
-    ds = 25  # LES grid spacing
-    fs = 5  # fire mesh ratio
-    ndx = 160  # EW number of grids
-    ndy = 400  # NS number of grids
+def makeLL(domain, modelrun):
+    bounds = config["unit5"]["sfire"][modelrun]["namelist"]
+    ds = bounds["dxy"]  # LES grid spacing
+    fs = bounds["fs"]  # fire mesh ratio
+    ndx = bounds["ndx"]  # EW number of grids
+    ndy = bounds["ndy"]  # NS number of grids
     ll_utm = [
-        336524,
-        6174820,
+        bounds["ll_utm"][0],
+        bounds["ll_utm"][1],
     ]  # lower left corner of the domain in UTM coordinates (meters)
     # ============ end of INPUTS==============
     ## create grid WRF LAT/LONG with defined inputs

@@ -1,252 +1,184 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jun  5 12:08:25 2019
+# %% [markdown]
+# Stull
 
-@author: crodell
-"""
+# %%
+import context
+import wrf
+import numpy as np
+import xarray as xr
+from pathlib import Path
+from netCDF4 import Dataset
 
 
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-import numpy as np
-import pandas as pd
-import matplotlib.image as mpimg
-from scipy.interpolate import griddata
-from datetime import datetime, timedelta
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+from context import root_dir, vol_dir, data_dir, save_dir
+import matplotlib.pylab as pylab
+import matplotlib
 
+matplotlib.rcParams.update({"font.size": 10})
 
-"######################  Adjust for user/times of interest/plot customization ######################"
-##User and file location
-user = "crodell"
-# file    = 'UBC10475163_0'
-filein = (
-    "/Users/"
-    + user
-    + "/Google Drive File Stream/Shared drives/Research/CRodell/Pelican_Mnt_Fire/Data/hobo_v2/"
-)
-save = (
-    "/Users/"
-    + user
-    + "/Google Drive File Stream/Shared drives/Research/CRodell/Pelican_Mnt_Fire/Images/hobo_v2/array/"
-)
+modelrun = "F6V51Z20"
 
-##Plot customization
-ylabel = 14
-fig_size = 20
-tick_size = 12
-title_size = 16
-
-
-##Time of Interst...Start and Stop
-start = datetime(2019, 5, 11, 17, 00)
-start_str = start.strftime("%Y-%m-%d %H:%M")
-
-stop = datetime(2019, 5, 11, 20, 00)
-stop_str = stop.strftime("%Y-%m-%d %H:%M")
-
-wesn = [-113.58732, -113.56174, 55.71347, 55.73186]
-
-
-locs = {
-    "Hobo 01": [-113.57310, 55.72225],
-    "Hobo 03": [-113.57010, 55.71806],
-    "Hobo 07": [-113.57362, 55.72039],
-    "Hobo 09": [-113.58120, 55.72463],
-    "Hobo 11": [-113.57655, 55.71809],
-    "Hobo 13": [-113.57414, 55.71719],
-    "Hobo 14": [-113.57356, 55.72124],
-    "Hobo 16": [-113.57845, 55.71871],
-    "Hobo 17": [-113.57930, 55.71961],
-    "Hobo 20": [-113.56644, 55.72111],
-    "Hobo 21": [-113.57783, 55.72118],
+params = {
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14,
+    "axes.labelsize": 14,
 }
 
-
-"######################  Read File ######################"
-temp_array, rh_array, time_array, hobo = [], [], [], []
+pylab.rcParams.update(params)
 
 
-hobo_list = [
-    "HOBO_01",
-    "HOBO_03",
-    "HOBO_07",
-    "HOBO_09",
-    "HOBO_11",
-    "HOBO_13",
-    "HOBO_14",
-    "HOBO_16",
-    "HOBO_17",
-    "HOBO_20",
-    "HOBO_21",
-]
+# %% [markdown]
+# Open dataset
+# %%
 
-# hobo_sorted = hobo.sorted()
-for i in range(len(hobo_list)):
-    path_list = filein + hobo_list[i]
-    df_hobo = pd.read_csv(path_list + ".csv", skiprows=[0])
-    hobo.append(path_list[-2:])
-
-    ##Make a list of foats of each variable
-    time = list(df_hobo[df_hobo.columns[1]])
-    temp, rh = np.array(df_hobo[df_hobo.columns[2]]), np.array(
-        df_hobo[df_hobo.columns[3]]
-    )
-
-    time, temp, rh = time[:-2], temp[:-2], rh[:-2]
-
-    ##############################################
-    #######Create a colum of times in MDT
-    ##############################################
-    mdt = []
-
-    def datetime_range(start, end, delta):
-        current = start
-        while current < end:
-            yield current
-            current += delta
-
-    dts = [
-        dt.strftime("%Y-%m-%d %H:%M")
-        for dt in datetime_range(
-            datetime(2019, 5, 6, 16, 30),
-            datetime(2019, 5, 21, 23, 55),
-            timedelta(minutes=5),
-        )
-    ]
-
-    for i in range(len(time)):
-        mdt.append(dts[i])
-
-    ##Find idex with start and stop time then make new list of each variable within that time interval
-    time_start = mdt.index(start_str)
-    time_stop = mdt.index(stop_str) + 1
-    time = mdt[time_start:time_stop]
-    temp, rh = temp[time_start:time_stop], rh[time_start:time_stop]
-    temp_array.append(temp)
-    rh_array.append(rh)
-    time = [i[-5:] for i in time]
-    time_array.append(time)
+save_dir = Path(str(save_dir) + f"/{modelrun}")
+save_dir.mkdir(parents=True, exist_ok=True)
+ds = xr.open_dataset(
+    str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_16:49:01", chunks="auto"
+)
 
 
-temp_array = np.array(temp_array)
-rh_array = np.array(rh_array)
+# %% [markdown]
+# Plot Gound Heat flux
 
-lat = [
-    55.72225,
-    55.71806,
-    55.72039,
-    55.72463,
-    55.71809,
-    55.71719,
-    55.72124,
-    55.71871,
-    55.71961,
-    55.72111,
-    55.72118,
-]
+ncfile = Dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_16:49:01")
 
-lon = [
-    -113.57310,
-    -113.57010,
-    -113.57362,
-    -113.58120,
-    -113.57655,
-    -113.57414,
-    -113.57356,
-    -113.57845,
-    -113.57930,
-    -113.56644,
-    -113.57783,
-]
+height = wrf.getvar(ncfile, "height")
+height.values[:, 0, 0]
 
-# lat = np.append(lat, [wesn[2], wesn[3], wesn[3], wesn[2]])
-# lon = np.append(lon, [wesn[0], wesn[1], wesn[0], wesn[1]])
-
-lat = np.array(lat)
-lon = np.array(lon)
+temp = wrf.getvar(ncfile, "theta_e", wrf.ALL_TIMES)
+dsi = temp.isel(Time=60, south_north=slice(110, 160), west_east=71)
+dsi.plot()
 
 
-# generate grid data
-numcols, numrows = 240, 240
-xi = np.linspace(lon.min(), lon.max(), numcols)
-yi = np.linspace(lat.min(), lat.max(), numrows)
-xi, yi = np.meshgrid(xi, yi)
+# %% [markdown]
+# Plot Gound Heat flux
+# %%
+dsi = ds.isel(
+    south_north_subgrid=slice(550, 620),
+    west_east_subgrid=slice(330, 405),
+    Time=slice(0, 44, 1),
+)
+dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
+dsi.FGRNHFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
+plt.savefig(str(save_dir) + "/FGRNHFX.png")
+
+# %% [markdown]
+# Plot Fire Area
+# %%
+dsi.FIRE_AREA.plot(
+    col="Time", col_wrap=3, cmap="gist_heat_r", extend="max", aspect=2, size=3
+)
+plt.savefig(str(save_dir) + "/FIRE_AREA.png")
+
+# # %% [markdown]
+# # Plot Observed Fire Heat Flux
+# # %%
+# dsi.FIRE_HFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
+# plt.savefig(str(save_dir) + "/FIRE_HFX.png")
+
+# %% [markdown]
+# Plot Fuel Fraction
+# %%
+dsi.FUEL_FRAC.plot(
+    col="Time", col_wrap=3, cmap="summer_r", extend="max", aspect=2, size=3
+)
+plt.savefig(str(save_dir) + "/FUEL_FRAC.png")
 
 
-img = mpimg.imread(filein[:-8] + "png/site_map.png")
+# %% [markdown]
+# Plot Rate of Spread
+# %%
+dsi.ROS.plot(col="Time", col_wrap=3, cmap="Purples", extend="max", aspect=2, size=3)
+plt.savefig(str(save_dir) + "/ROS.png")
 
-wesn = [-113.58732, -113.56174, 55.71347, 55.73186]
-time_save = [s.replace(":", "") for s in time]
+# %% [markdown]
+# Plot Fireline Intensity
+# %%
+dsi.FLINEINT.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
+plt.savefig(str(save_dir) + "/FLINEINT.png")
 
-
-v = np.linspace(20, 35, 31)
-Cnorm = colors.Normalize(vmin=20, vmax=35)
-
-
-for i in range(len(time)):
-    # interpolate, there are better methods, especially if you have many datapoints
-    zi = griddata((lon, lat), temp_array[:, i], (xi, yi), method="cubic")
-
-    fig, ax = plt.subplots(1, figsize=(12, 10))
-    ax.imshow(
-        img[:, :, :], extent=wesn
-    )  # overlay this image over the original background,
-
-    for key in locs.keys():
-        x = float(locs[key][0])
-        y = float(locs[key][1])
-        ax.scatter(x, y, c="k", s=2, zorder=10)
-    #        ax.annotate(key, xy = (x,y), color='w',xytext = (x,y),\
-    #                     bbox = dict(boxstyle="round", fc="black", ec="b",alpha=.4))
-    C = ax.contourf(xi, yi, zi, alpha=0.7, norm=Cnorm, cmap="YlOrRd", levels=v)
-    ax.set_title("May 11th  " + time_save[i] + " (MDT)", fontsize=16)
-    ax.set_xlim(-113.582, -113.566)
-    ax.set_ylim(55.7168, 55.7250)
-    ax.tick_params(axis="both", which="major", labelsize=tick_size)
-
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    clb = plt.colorbar(C, cax=cax)
-    clb.set_label("Temperature (\N{DEGREE SIGN}C)", fontsize=ylabel)
-    clb.ax.tick_params(labelsize=tick_size)
-    clb.set_alpha(0.95)
-    clb.draw_all()
-
-    fig.savefig(save + "v2_Array_Temp" + time_save[i])
+# %% [markdown]
+# Plot Heat flux from ground fire every min for first 20 mins
+# %%
+dsi = ds.isel(
+    south_north=slice(110, 160),
+    west_east=slice(60, 85),
+    Time=slice(0, 168, 6),
+)
+dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
+dsi.GRNHFX.plot(col="Time", col_wrap=4, cmap="Reds", extend="max")
+plt.savefig(str(save_dir) + "/GRNHFX.png")
 
 
-v = np.linspace(15, 40, 51)
-Cnorm = colors.Normalize(vmin=15, vmax=40)
+# %% [markdown]
+# Plot PM25 concentrations at ground level every min for full 40 mins
+# %%
+dsi = ds.isel(
+    south_north=slice(110, 160),
+    west_east=slice(60, 85),
+    south_north_subgrid=slice(550, 620),
+    west_east_subgrid=slice(330, 405),
+    bottom_top=0,
+    # Time=slice(0, 252, 12),
+    Time=slice(0, 235, 12),
+)
 
-for i in range(len(time)):
-    # interpolate, there are better methods, especially if you have many datapoints
-    zi = griddata((lon, lat), rh_array[:, i], (xi, yi), method="cubic")
+dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
+dsi.tr17_1.plot(
+    col="Time",
+    col_wrap=4,
+    cmap="cubehelix_r",
+    levels=np.arange(0, 30100, 100),
+    extend="max",
+)
+plt.savefig(str(save_dir) + "/PM25_ground.png")
 
-    fig, ax = plt.subplots(1, figsize=(12, 10))
-    ax.imshow(
-        img[:, :, :], extent=wesn
-    )  # overlay this image over the original background,
 
-    for key in locs.keys():
-        x = float(locs[key][0])
-        y = float(locs[key][1])
-        ax.scatter(x, y, c="k", s=4, zorder=10)
-    #        ax.annotate(key, xy = (x,y), color='w',xytext = (x,y),\
-    #                     bbox = dict(boxstyle="round", fc="black", ec="b",alpha=.4))
-    C = ax.contourf(xi, yi, zi, alpha=0.7, norm=Cnorm, cmap=plt.cm.BuPu, levels=v)
-    ax.set_title("May 11th  " + time_save[i] + " (MDT)", fontsize=16)
-    ax.set_xlim(-113.582, -113.566)
-    ax.set_ylim(55.7168, 55.7250)
-    ax.tick_params(axis="both", which="major", labelsize=tick_size)
+# %% [markdown]
+# Plot Vertically integrated PM25 concentrations every min for full 40 mins
+# %%
+dsi = ds.isel(
+    south_north=slice(110, 399),
+    west_east=slice(30, 200),
+    south_north_subgrid=slice(550, 620),
+    west_east_subgrid=slice(330, 405),
+    # Time=slice(0, 252, 12),
+    Time=slice(0, 235, 12),
+)
 
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    clb = plt.colorbar(C, cax=cax)
-    clb.set_label("Relative Humidity (%)", fontsize=ylabel)
-    clb.ax.tick_params(labelsize=tick_size)
-    clb.set_alpha(0.95)
-    clb.draw_all()
+dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
+dsi = dsi.sum(dim="bottom_top")
+dsi.tr17_1.plot(
+    col="Time",
+    col_wrap=4,
+    cmap="cubehelix_r",
+    levels=np.arange(0, 30100, 100),
+    extend="max",
+)
+plt.savefig(str(save_dir) + "/PM25_vert_int.png")
 
-    fig.savefig(save + "v2_Array_RH" + time_save[i])
+
+# %% [markdown]
+# Plot Surface Temp over fire
+# %%
+dsi = ds.isel(
+    south_north=slice(110, 160),
+    west_east=slice(60, 85),
+    south_north_subgrid=slice(550, 620),
+    west_east_subgrid=slice(330, 405),
+    # Time=slice(0, 252, 12),
+    Time=slice(0, 235, 12),
+)
+
+dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
+dsi = dsi.sum(dim="bottom_top")
+dsi.T2.plot(
+    col="Time",
+    col_wrap=4,
+    cmap="coolwarm",
+    # levels=np.arange(0, 30100, 100),
+    extend="both",
+)
+plt.savefig(str(save_dir) + "/T2.png")
