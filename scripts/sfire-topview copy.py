@@ -21,23 +21,19 @@ import matplotlib.colors as colors
 from utils.sfire import makeLL
 
 
-##################### Define Inputs and File Directories ###################
+pm_ef = 21.05  # boreal wildfire emission factor Urbanski (2014)
 modelrun = "F6V51M08Z22"
-configid = "F6V51"
-domain = "met"
-# pm_ef = 21.05  # boreal wildfire emission factor Urbanski (2014)
-pm_ef = 10.400
-fireshape_path = str(data_dir) + "/unit_5/unit_5"
-aqsin = str(data_dir) + "/obs/aq/"
-aqsin = sorted(Path(aqsin).glob(f"*"))
-save_dir = Path(str(save_dir) + f"/{modelrun}/")
-save_dir.mkdir(parents=True, exist_ok=True)
-
 var = "tr17_1"
 title = "Tracer"
 units = "Concentration g kg^-1"
 cmap = "cubehelix_r"
-levels = np.arange(0, 10000.0, 100)
+levels = np.arange(0, 48600.0, 100)
+fire_XLAT, fire_XLONG = makeLL("fire")
+alpha = 0.7
+TimeSlice = slice(0, 100)
+fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
+save_dir = Path(str(save_dir) + f"/{modelrun}/")
+save_dir.mkdir(parents=True, exist_ok=True)
 
 
 with open(str(root_dir) + "/json/config.json") as f:
@@ -47,10 +43,29 @@ ros = config["unit5"]["obs"]["ros"]
 
 
 wrf_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
-wrf_ds = wrf_ds.sum("bottom_top")
-XLAT, XLONG = makeLL(domain, configid)
-times = wrf_ds.XTIME.values
-dimT = len(times)
+
+fire_XLAT = fire_XLAT.isel(
+    south_north_subgrid=slice(550, 620), west_east_subgrid=slice(330, 405)
+)
+fire_XLONG = fire_XLONG.isel(
+    south_north_subgrid=slice(550, 620), west_east_subgrid=slice(330, 405)
+)
+wrf_ds = wrf_ds.isel(
+    south_north_subgrid=slice(550, 620),
+    west_east_subgrid=slice(330, 405),
+    south_north=slice(110, 180),
+    west_east=slice(40, 100),
+    Time=TimeSlice,
+)
+
+var_ds = xr.open_dataset(str(data_dir) + f"/fuel{fueltype}/interp-unit5-{var}.nc")
+var_ds = var_ds.sum("interp_level")
+var_ds = var_ds.isel(
+    south_north=slice(110, 180), west_east=slice(40, 100), Time=TimeSlice
+)
+
+XLAT, XLONG = var_ds.XLAT.values, var_ds.XLONG.values
+dimT = len(var_ds.Time)
 
 
 fig = plt.figure(figsize=(10, 6))
@@ -65,12 +80,21 @@ bm = Basemap(
 )
 polygons = bm.readshapefile(fireshape_path, name="units", drawbounds=True, zorder=9)
 [ax.scatter(aqs[s]["lon"], aqs[s]["lat"], zorder=10) for s in aqs]
-ds = wrf_ds.isel(Time=0)
-ax.set_title(f"{title} \n" + ds.XTIME.values.astype(str)[:-10], fontsize=18)
+ds = var_ds.isel(Time=0)
+ax.set_title(f"{title} \n" + ds.Time.values.astype(str)[:-10], fontsize=18)
 contour = ax.contourf(
-    XLONG, XLAT, ds[var], zorder=2, cmap=cmap, levels=levels, extend="max"
+    XLONG, XLAT, ds[var], zorder=2, cmap=cmap, levels=levels, extend="max", alpha=alpha
 )
-
+fire = ax.contourf(
+    fire_XLONG,
+    fire_XLAT,
+    wrf_ds["FGRNHFX"].isel(Time=0),
+    zorder=1,
+    cmap="Reds",
+    levels=np.arange(100, 70000.0, 100),
+    extend="max",
+    alpha=alpha,
+)
 ax.set_xlabel("Longitude (degres)", fontsize=16)
 ax.set_ylabel("Latitude (degres)", fontsize=16)
 ax.tick_params(axis="both", which="major", labelsize=14)
@@ -79,15 +103,20 @@ cbar = plt.colorbar(contour, ax=ax, pad=0.05)
 cbar.ax.tick_params(labelsize=12)
 cbar.set_label(units, rotation=270, fontsize=16, labelpad=15)
 
+cbar_fire = plt.colorbar(fire, ax=ax, pad=0.01)
+cbar_fire.ax.tick_params(labelsize=12)
+cbar_fire.set_label("W m^-2", rotation=270, fontsize=16, labelpad=15)
+
 
 def update_plot(i):
     global contour, fire
     for c in contour.collections:
         c.remove()
-
+    for c in fire.collections:
+        c.remove()
     print(i)
-    ds = wrf_ds.isel(Time=i)
-    ax.set_title(f"{title} \n" + ds.XTIME.values.astype(str)[:-10], fontsize=18)
+    ds = var_ds.isel(Time=i)
+    ax.set_title(f"{title} \n" + ds.Time.values.astype(str)[:-10], fontsize=18)
     contour = ax.contourf(
         XLONG,
         XLAT,
@@ -96,8 +125,19 @@ def update_plot(i):
         cmap=cmap,
         levels=levels,
         extend="both",
+        alpha=alpha,
     )
-    return contour
+    fire = ax.contourf(
+        fire_XLONG,
+        fire_XLAT,
+        wrf_ds["FGRNHFX"].isel(Time=i),
+        zorder=1,
+        cmap="Reds",
+        levels=np.arange(100, 70000.0, 100),
+        extend="max",
+        alpha=alpha,
+    )
+    return contour, fire
 
 
 fig.tight_layout()

@@ -31,15 +31,17 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 domain = "fire"
 unit = "unit5"
-modelrun = "F6V51M08R24"
-configid = modelrun[:-6]
+ignition = "multi"
+modelrun = "F6V51M08Z22I04B10"
+configid = "F6V51"
 title = "Time of Arrival"
-# units = "degrees C"
 var = "FGRNHFX"
+ig_start = [55.7177497, -113.5713062]
+ig_end = [55.7177507, -113.5751922]
 v = np.arange(0, 201, 1)
 Cnorm = colors.Normalize(vmin=0, vmax=200)
 ros_filein = str(data_dir) + "/obs/ros/"
-fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
+fireshape_path = str(root_dir) + "/data/unit_5/unit_5"
 headers = ["day", "hour", "minute", "second", "temp"]
 save_dir = Path(str(save_dir) + f"/{modelrun}/")
 save_dir.mkdir(parents=True, exist_ok=True)
@@ -61,7 +63,7 @@ var_da = wrf_ds[var]
 var_da = var_da.sel(
     south_north_subgrid=south_north_subgrid,
     west_east_subgrid=west_east_subgrid,
-    Time=slice(0, 50),
+    Time=slice(3, 50),
 )
 times = var_da.XTIME.values
 
@@ -131,6 +133,7 @@ def normalize(y):
 
 cols = ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
 fig = plt.figure(figsize=(14, 8))
+fig.suptitle(modelrun)
 ax_map = fig.add_subplot(2, 2, 1)
 bm = Basemap(
     llcrnrlon=XLONG[0, 0],
@@ -141,12 +144,72 @@ bm = Basemap(
     ax=ax_map,
 )
 polygons = bm.readshapefile(fireshape_path, name="units", drawbounds=True, zorder=1)
-ax_map.scatter(
-    -113.571244, 55.71776, c="red", s=80, marker="*", label="ignition start", zorder=10
-)
-ax_map.scatter(
-    -113.575172, 55.7177788, c="red", marker="H", s=60, label="ignition end", zorder=10
-)
+
+
+def ignite(ig_start, ig_end, line, color):
+    ax_map.scatter(
+        ig_start[1],
+        ig_start[0],
+        c=color,
+        s=80,
+        marker="*",
+        alpha=0.6,
+        label=f"{line} ignition start",
+        zorder=10,
+    )
+    ax_map.scatter(
+        ig_end[1],
+        ig_end[0],
+        c=color,
+        marker="H",
+        s=60,
+        alpha=0.6,
+        label=f"{line} ignition end",
+        zorder=10,
+    )
+    ax_map.plot(
+        [ig_start[1], ig_end[1]],
+        [ig_start[0], ig_end[0]],
+        linestyle="--",
+        lw=0.5,
+        marker="",
+        zorder=10,
+        color=color,
+        alpha=0.6,
+    )
+
+
+if ignition == "single":
+    ignite(ig_start, ig_end, line="1", color="red")
+
+elif ignition == "multi":
+    ignite(
+        ig_start=[55.7177529, -113.5713107],
+        ig_end=[55.71773480, -113.57183453],
+        line="1",
+        color="red",
+    )
+    ignite(
+        ig_start=[55.71774808, -113.57232778],
+        ig_end=[55.71771973, -113.57299677],
+        line="2",
+        color="blue",
+    )
+    ignite(
+        ig_start=[55.71771900, -113.57341997],
+        ig_end=[55.7177473680, -113.5742683254],
+        line="3",
+        color="green",
+    )
+    ignite(
+        ig_start=[55.7177775603, -113.5747705233],
+        ig_end=[55.717752429, -113.575192125],
+        line="4",
+        color="black",
+    )
+else:
+    raise ValueError("Invalid Ingnition Configuration")
+
 shape = XLAT.shape
 ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 15))
 labels = [item.get_text() for item in ax_map.get_xticklabels()]
@@ -186,15 +249,119 @@ def plotstuff(i):
     ax.text(
         0.02, 0.65, col, size=14, color="k", zorder=10, transform=plt.gca().transAxes
     )
-    ax.scatter(
-        pd.Timestamp(2019, 5, 11, 17, 49, 3),
-        0.03,
-        marker="*",
-        color="red",
-        zorder=10,
-        label="Ignition Time",
-        s=100,
-    )
+    if ignition == "single":
+        ax.scatter(
+            pd.Timestamp(2019, 5, 11, 17, 49, 48),
+            0.03,
+            marker="*",
+            alpha=0.6,
+            color="red",
+            zorder=10,
+            label="Ignition Start Time",
+            s=80,
+        )
+        ax.scatter(
+            pd.Timestamp(2019, 5, 11, 17, 51, 28),
+            0.03,
+            marker="H",
+            alpha=0.6,
+            color="red",
+            zorder=10,
+            label="Ignition End Time",
+            s=50,
+        )
+    elif ignition == "multi":
+        if col == "C2" or col == "C3":
+            print(col)
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 49, 48),
+                0.03,
+                marker="*",
+                alpha=0.6,
+                color="red",
+                zorder=10,
+                label="Ignition Start Time",
+                s=80,
+            )
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 49, 56),
+                0.03,
+                marker="H",
+                alpha=0.6,
+                color="red",
+                zorder=10,
+                label="Ignition End Time",
+                s=50,
+            )
+        elif col == "C4" or col == "C5":
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 50, 7),
+                0.03,
+                marker="*",
+                alpha=0.6,
+                color="blue",
+                zorder=10,
+                label="Ignition Start Time",
+                s=80,
+            )
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 50, 17),
+                0.03,
+                marker="H",
+                alpha=0.6,
+                color="blue",
+                zorder=10,
+                label="Ignition End Time",
+                s=50,
+            )
+
+        elif col == "C6" or col == "C7":
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 50, 42),
+                0.03,
+                marker="*",
+                alpha=0.6,
+                color="green",
+                zorder=10,
+                label="Ignition Start Time",
+                s=80,
+            )
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 50, 57),
+                0.03,
+                marker="H",
+                alpha=0.6,
+                color="green",
+                zorder=10,
+                label="Ignition End Time",
+                s=50,
+            )
+        elif col == "C8" or col == "C9":
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 52, 49),
+                0.03,
+                marker="*",
+                alpha=0.6,
+                color="black",
+                zorder=10,
+                label="Ignition Start Time",
+                s=80,
+            )
+            ax.scatter(
+                pd.Timestamp(2019, 5, 11, 17, 52, 55),
+                0.03,
+                marker="H",
+                alpha=0.6,
+                color="black",
+                zorder=10,
+                label="Ignition End Time",
+                s=50,
+            )
+        else:
+            pass
+
+    else:
+        raise ValueError("Invalid Ingnition Configuration")
     if col == "C9":
         myFmt = DateFormatter("%H:%M:%S")
         ax.xaxis.set_major_formatter(myFmt)
@@ -214,7 +381,7 @@ def plotstuff(i):
     ax_map.set_title(f"{title}", fontsize=18)
     ax_map.annotate(
         col,
-        xy=(ros[ros_ids[indices[0]]]["lon"], 55.71745),
+        xy=(ros[ros_ids[indices[0]]]["lon"], 55.71740),
         color="w",
         bbox=dict(boxstyle="circle", fc="black", ec="k", alpha=0.8),
         ha="center",

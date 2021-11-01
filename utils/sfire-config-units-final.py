@@ -29,16 +29,16 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 # %%
 # ============ INPUTS==============
-modelrun = "TEST"
+modelrun = "SINGLELINE"
 ds = 25  # LES grid spacing
 fs = 5  # fire mesh ratio
 ndx = 160  # EW number of grids
 ndy = 400  # NS number of grids
-t2 = 290  # surface temperature
-buff = 20  # buffer size (ie firebreaks) around units
+skin = 290  # skin surface temperature
+buff = 40  # buffer size (ie firebreaks) around units
 fueltype = 6  # anderson fuels type
-ig_start = [55.7177788, -113.571412]
-ig_end = [55.7177788, -113.575172]
+ig_start = [55.7177497, -113.5713062]
+ig_end = [55.7177507, -113.5751922]
 sw = [55.717153, -113.57668]
 ne = [55.720270, -113.569517]
 fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
@@ -56,6 +56,21 @@ save_dir.mkdir(parents=True, exist_ok=True)
 
 img_dir = Path(str(root_dir) + f"/img/{modelrun}")
 img_dir.mkdir(parents=True, exist_ok=True)
+
+# %%
+# Part I: create a perturbed surface temperature to start off convection-------------
+surface_T = (
+    (np.random.rand(ndx, ndy) - 0.5) * 1.5
+) + skin  # perturbes surface by half a degree +/-
+dim_header = ",".join(
+    map(str, np.shape(surface_T))
+)  # creates a header required by wrf-sfire, which is just dimensions
+
+# save output file
+np.savetxt(
+    str(save_dir) + "/input_tsk", surface_T, header=dim_header, comments="", fmt="%1.2f"
+)  # saves as text file, with some formatting
+
 
 # %%
 # Part IIa: create a fuel mask -----------------------------------
@@ -77,9 +92,6 @@ WGSx, WGSy = pyproj.transform(
 XLONG, XLAT = np.reshape(WGSx, np.shape(UTMx)), np.reshape(WGSy, np.shape(UTMy))
 
 
-# print('.. configuring a map')
-# bm = Basemap(llcrnrlon=XLONG[0,0], llcrnrlat=XLAT[0,0],\
-# 					 urcrnrlon=X[-1,-1], urcrnrlat=XLAT[-1,-1], resolution='f', epsg=4326) #full resolution is slow
 print(".. configuring a map")
 bm = Basemap(
     llcrnrlon=XLONG[0, 0],
@@ -89,9 +101,17 @@ bm = Basemap(
     epsg=4326,
 )
 
+# try:
+#     ds_fuel = xr.open_zarr(str(save_dir) + f"/fuel{fueltype}.zarr")
+#     fuel = ds_fuel.fuel.values
+#     print(f"found {modelrun} fuels dataset")
+# except:
+# %%
 
-print("could not find fuels dataset, building.....")
-## create buffer around each unit plot
+# gpkg_df = gpd.read_file(str(data_dir) + "/pel/Polygons_Unit5_zontations.gpkg")
+# print("could not find fuels dataset, building.....")
+
+
 gdf = gpd.read_file(fireshape_path + ".shp")
 gdf = gdf.to_crs(epsg=26912)
 gdf["geometry"] = gdf.geometry.buffer(buff)
@@ -106,10 +126,9 @@ polygons_buff = bm.readshapefile(
     str(root_dir) + "/data/shp/unit_buffer",
     name="buff",
     drawbounds=True,
-    color="pink",
+    color="blue",
 )
 
-# try:
 fuel = np.full_like(XLONG, fueltype)
 ravel_array = np.array(list(zip(XLONG.ravel(), XLAT.ravel())))
 for i in range(len(bm.units)):
@@ -120,11 +139,96 @@ for i in range(len(bm.units)):
     buffer_mask = buff.contains_points(ravel_array)
     buffer_mask = np.reshape(buffer_mask, np.shape(XLONG))
     fuel[buffer_mask != unit_mask] = 14  ## define fire breaks as non-fuel
+
+
 for i in range(len(bm.units)):
     unit = path.Path(bm.units[i])
     unit_mask = unit.contains_points(ravel_array)
     unit_mask = np.reshape(unit_mask, np.shape(XLONG))
     fuel[unit_mask] = fueltype
+
+# %%
+## create buffer around each unit plot
+gdf = gpd.read_file(str(data_dir) + "/final/unit_5.shp")
+gdf = gdf.to_crs(epsg=26912)
+gdf["geometry"] = gdf.geometry.buffer(10)
+gdf.to_file(str(root_dir) + "/data/shp/extend_5.shp", driver="ESRI Shapefile")
+gdf = gpd.read_file(str(root_dir) + "/data/shp/extend_5.shp")
+gdf = gdf.to_crs(epsg=4326)
+gdf.to_file(str(root_dir) + "/data/shp/extend_5.shp", driver="ESRI Shapefile")
+
+gdf = gpd.read_file(str(root_dir) + "/data/shp/extend_5.shp")
+# gdf = gpd.read_file(str(data_dir) + "/final/unit_5.shp")
+gdf = gdf.to_crs(epsg=26912)
+gdf["geometry"] = gdf.geometry.buffer(10)
+gdf.to_file(str(root_dir) + "/data/shp/buff_5.shp", driver="ESRI Shapefile")
+gdf = gpd.read_file(str(root_dir) + "/data/shp/buff_5.shp")
+gdf = gdf.to_crs(epsg=4326)
+gdf.to_file(str(root_dir) + "/data/shp/buff_5.shp", driver="ESRI Shapefile")
+
+
+gdf = gpd.read_file(str(data_dir) + "/mini_5/mini_5.shp")
+gdf = gdf.to_crs(epsg=26912)
+gdf["geometry"] = gdf.geometry.buffer(-8)
+gdf.to_file(str(root_dir) + "/data/shp/buff_mini_5.shp", driver="ESRI Shapefile")
+gdf = gpd.read_file(str(root_dir) + "/data/shp/buff_mini_5.shp")
+gdf = gdf.to_crs(epsg=4326)
+gdf.to_file(str(root_dir) + "/data/shp/buff_mini_5.shp", driver="ESRI Shapefile")
+
+buff_5 = bm.readshapefile(
+    str(root_dir) + "/data/shp/buff_5",
+    name="buff_5",
+    drawbounds=True,
+    color="red",
+)
+
+buff_5 = path.Path(bm.buff_5[0])
+buff_5_mask = buff_5.contains_points(ravel_array)
+buff_5_mask = np.reshape(buff_5_mask, np.shape(XLONG))
+fuel[buff_5_mask] = 14  ## define fire breaks as non-fuel
+
+
+polygon_5 = bm.readshapefile(
+    str(root_dir) + "/data/shp/extend_5",
+    # str(data_dir) + "/unit_5/unit_5",
+    name="unit_5",
+    drawbounds=True,
+    color="red",
+)
+
+unit5_final = path.Path(bm.unit_5[0])
+unit5_final_mask = unit5_final.contains_points(ravel_array)
+unit5_final_mask = np.reshape(unit5_final_mask, np.shape(XLONG))
+fuel[unit5_final_mask] = fueltype  ## define fire breaks as non-fuel
+
+
+buff_mini_5 = bm.readshapefile(
+    str(root_dir) + "/data/shp/buff_mini_5",
+    name="buff_mini_5",
+    drawbounds=True,
+    color="red",
+)
+
+buff_mini_5 = path.Path(bm.buff_mini_5[0])
+buff_mini_5_mask = buff_mini_5.contains_points(ravel_array)
+buff_mini_5_mask = np.reshape(buff_mini_5_mask, np.shape(XLONG))
+fuel[buff_mini_5_mask] = fueltype  ## define fire breaks as non-fuel
+
+
+# polygon_5 = bm.readshapefile(
+#     str(root_dir) + "/data/unit_5/unit_5",
+#     name="unit_5",
+#     drawbounds=True,
+#     color="red",
+# )
+
+# unit5_final = path.Path(bm.unit_5[0])
+# unit5_final_mask = unit5_final.contains_points(
+#     ravel_array
+# )
+# unit5_final_mask = np.reshape(unit5_final_mask, np.shape(XLONG))
+# fuel[unit5_final_mask] = fueltype  ## define fire breaks as non-fuel
+
 
 da = xr.DataArray(
     name="fuel",
@@ -139,7 +243,7 @@ da = xr.DataArray(
     ),
 )
 ds_fuel = da.to_dataset()
-ds_fuel.to_zarr(str(root_dir) + f"/data/zarr/fuel{fueltype}-old.zarr", mode="w")
+ds_fuel.to_zarr(str(save_dir) + f"/fuel{fueltype}.zarr", mode="w")
 
 
 dim_header_fire = ",".join(map(str, np.shape(fuel.T)))
@@ -159,35 +263,16 @@ plt.title("ENTIRE LES DOMAIN WITH FIRE PLOT")
 plt.savefig(str(img_dir) + "/les-domain.png")
 plt.show()
 
-# sanity-check plot
-plt.figure(figsize=(10, 8))
-contour = bm.contourf(XLONG, XLAT, fuel)
-# xx, yy = np.meshgrid(np.arange(0, gridx.shape[1], 1), np.arange(0, gridx.shape[0], 1))
-# plt.contourf(xx, yy, fuel)
-# # polygons = bm.readshapefile(fireshape_path,name='units',drawbounds=True, color='red')
-plt.colorbar(contour, orientation="horizontal")
-plt.title("ENTIRE LES DOMAIN WITH FIRE PLOT")
-plt.show()
-
 # %%
 # Part IIb: locate ignition -----------------------------------
-## find ignition location on wrf grid based on lat and lon
-try:
-    ## try and open kdtree for domain
-    dmtree, dmlocs = pickle.load(open(str(root_dir) + f"/data/tree/dmtree-old.p", "rb"))
-    print("Found Domain Tree")
-except:
-    ## build a kd-tree for fwf domain if not found
-    print("Could not find Domain KDTree building.")
-    ## create dataframe with columns of all lat/long in the domianrows are cord pairs
-    dmlocs = pd.DataFrame({"XLAT": XLAT.ravel(), "XLONG": XLONG.ravel()})
-    ## build kdtree
-    dmtree = KDTree(dmlocs)
-    ## save tree
-    pickle.dump(
-        [dmtree, dmlocs], open(str(root_dir) + f"/data/tree/dmtree-old.p", "wb")
-    )
-    print("Domain KDTree built")
+print("Could not find Domain KDTree building.")
+## create dataframe with columns of all lat/long in the domianrows are cord pairs
+dmlocs = pd.DataFrame({"XLAT": XLAT.ravel(), "XLONG": XLONG.ravel()})
+## build kdtree
+dmtree = KDTree(dmlocs)
+## save tree
+pickle.dump([dmtree, dmlocs], open(str(save_dir) + f"/dmtree.p", "wb"))
+print("Domain KDTree built")
 
 sw_bool = np.array(sw).reshape(1, -1)
 ne_bool = np.array(ne).reshape(1, -1)
@@ -198,14 +283,48 @@ ne_ = np.unravel_index(int(ne_ind), XLAT.shape)
 nsew = [ne_[0], sw_[0], ne_[1], sw_[1]]
 
 
-igs_bool = np.array(ig_start).reshape(1, -1)
-ige_bool = np.array(ig_end).reshape(1, -1)
-igs_dist, igs_ind = dmtree.query(igs_bool, k=1)
-ige_dist, ige_ind = dmtree.query(ige_bool, k=1)
-igs = np.unravel_index(int(igs_ind), XLAT.shape)
-ige = np.unravel_index(int(ige_ind), XLAT.shape)
+def findige(ig_start, ig_end, line, color):
+    igs_bool = np.array(ig_start).reshape(1, -1)
+    ige_bool = np.array(ig_end).reshape(1, -1)
+    igs_dist, igs_ind = dmtree.query(igs_bool, k=1)
+    ige_dist, ige_ind = dmtree.query(ige_bool, k=1)
+    igs = np.unravel_index(int(igs_ind), XLAT.shape)
+    ige = np.unravel_index(int(ige_ind), XLAT.shape)
+    plt.scatter(
+        XLONG[igs[0], igs[1]],
+        XLAT[igs[0], igs[1]],
+        c=color,
+        label=f"{line} ignition start",
+        zorder=10,
+    )
+    plt.plot(
+        [XLONG[igs[0], igs[1]], XLONG[ige[0], ige[1]]],
+        [XLAT[igs[0], igs[1]], XLAT[ige[0], ige[1]]],
+        linestyle="--",
+        marker="",
+        zorder=9,
+        color=color,
+    )
+    plt.scatter(
+        XLONG[ige[0], ige[1]],
+        XLAT[ige[0], ige[1]],
+        c=color,
+        marker="*",
+        s=60,
+        label=f"{line} ignition end",
+        zorder=10,
+    )
+    print(f"################### {line} ###################")
+    print(f"fire_ignition_start_x{line} = %s" % gridx[igs[0], igs[1]])
+    print(f"fire_ignition_start_y{line} = %s" % gridy[igs[0], igs[1]])
+    print(f"fire_ignition_end_x{line} = %s" % gridx[ige[0], ige[1]])
+    print(f"fire_ignition_end_y{line} = %s" % gridy[ige[0], ige[1]])
+    print(f"##############################################")
+
+    return igs, ige
 
 
+# igs, ige = findige(ig_start, ig_end)
 # UNIT 4 WESTERLY
 plt.figure(figsize=(10, 8))
 plt.title("CLOSEUP OF THE FIRE PLOT")
@@ -217,47 +336,76 @@ bmX = Basemap(
     epsg=4326,
 )
 polygonsX = bmX.readshapefile(
-    fireshape_path, name="units", drawbounds=True, color="red"
+    str(root_dir) + "/data/unit_5/unit_5", name="unit_5", drawbounds=True, color="red"
 )
 
-bmX.contourf(
+bmX.pcolormesh(
     XLONG[nsew[1] : nsew[0], nsew[3] : nsew[2]],
     XLAT[nsew[1] : nsew[0], nsew[3] : nsew[2]],
     fuel[nsew[1] : nsew[0], nsew[3] : nsew[2]],
 )
 plt.colorbar(orientation="horizontal", label="fuel category")
-plt.scatter(
-    XLONG[igs[0], igs[1]], XLAT[igs[0], igs[1]], c="red", label="ignition start"
-)
-plt.scatter(
-    XLONG[ige[0], ige[1]],
-    XLAT[ige[0], ige[1]],
-    c="red",
-    marker="*",
-    s=60,
-    label="ignition end",
-)
+igs, ige = findige(ig_start, ig_end, line="1", color="red")
 plt.legend()
+plt.savefig(str(img_dir) + "/unit-domain.png")
 plt.show()
-#
 
 
-# #UNIT 5 SOUTHERLY
-print("fire_ignition_start_x1 = %s" % gridx[igs[0], igs[1]])
-print("fire_ignition_start_y1 = %s" % gridy[igs[0], igs[1]])
-print("fire_ignition_end_x1 = %s" % gridx[ige[0], ige[1]])
-print("fire_ignition_end_y1 = %s" % gridy[ige[0], ige[1]])
+# igs, ige = findige(ig_start, ig_end)
+plt.figure(figsize=(10, 8))
+plt.title("CLOSEUP OF THE FIRE PLOT MULTI IGNITIONS")
+bmX = Basemap(
+    llcrnrlon=XLONG[nsew[1], nsew[3]],
+    llcrnrlat=XLAT[nsew[1], nsew[3]],
+    urcrnrlon=XLONG[nsew[0], nsew[2]],
+    urcrnrlat=XLAT[nsew[0], nsew[2]],
+    epsg=4326,
+)
+polygonsX = bmX.readshapefile(
+    str(root_dir) + "/data/unit_5/unit_5", name="unit_5", drawbounds=True, color="red"
+)
 
-# # %%
-# # Part III: Generate sounding from forecast-----------------------------------
+bmX.pcolormesh(
+    XLONG[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+    XLAT[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+    fuel[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+)
+plt.colorbar(orientation="horizontal", label="fuel category")
+igs_01, ige_01 = findige(
+    [55.7177529, -113.5713107], [55.71773480, -113.57183453], line="1", color="red"
+)
+igs_02, ige_02 = findige(
+    [55.7177109, -113.5721005], [55.7177016, -113.5728363], line="2", color="blue"
+)
+igs_03, ige_03 = findige(
+    [55.7177293, -113.5734885], [55.7177437, -113.5744894], line="3", color="green"
+)
+igs_04, ige_04 = findige(
+    [55.7177775603, -113.5747705233],
+    [55.717752429, -113.575192125],
+    line="4",
+    color="black",
+)
 
-# """
-# Needed format:
-# P0(mb)    T0(K)    Q0(g/kg)
-# z1(m)     T1       Q1       U1(m/s)   V1(m/s)
+# igs_01, ige_01 = findige([55.7177529, -113.5713107], [55.71773480, -113.57183453], line = '1', color = 'red')
+# igs_02, ige_02 = findige([55.71774808, -113.57232778], [55.71771973, -113.57299677], line = '2', color = 'blue')
+# igs_03, ige_03 = findige([55.71771900, -113.57341997], [55.7177473680, -113.5742683254], line = '3', color = 'green')
+# igs_04, ige_04 = findige([55.7177775603, -113.5747705233], [55.717752429, -113.575192125], line = '4', color = 'black')
+plt.legend()
+plt.savefig(str(img_dir) + "/unit-domain.png")
+plt.show()
 
-# zn(m)     Tn       Qn       Un(m/s)   Vn(m/s)
-# """
+
+# %%
+# Part III: Generate sounding from forecast-----------------------------------
+
+"""
+Needed format:
+P0(mb)    T0(K)    Q0(g/kg)
+z1(m)     T1       Q1       U1(m/s)   V1(m/s)
+
+zn(m)     Tn       Qn       Un(m/s)   Vn(m/s)
+"""
 
 # # pull correct forecast
 # today = pd.Timestamp.today()
@@ -275,25 +423,6 @@ print("fire_ignition_end_y1 = %s" % gridy[ige[0], ige[1]])
 # tree = KDTree(locs)
 # dist, ind = tree.query(fire_loc, k=1)
 # iz, ilat, ilon = np.unravel_index(ind[0], shape=np.shape(ds_wrf.variables["XLAT"]))
-
-
-# ## create a perturbed surface temperature to start off convection-------------
-# print(f'Surfcae temp {np.ceil(float(ds_wrf["T2"][0, ilat, ilon]))}')
-# surface_T = (
-#     (np.random.rand(ndx, ndy) - 0.5) * 1.5
-# ) +  np.ceil(float(ds_wrf["T2"][0, ilat, ilon])) # perturbes surface by half a degree +/-
-# dim_header = ",".join(
-#     map(str, np.shape(surface_T))
-# )  # creates a header required by wrf-sfire, which is just dimensions
-
-# # save output file
-# np.savetxt(
-#     str(root_dir) + "/data/wrfinput/input_tsk",
-#     surface_T,
-#     header=dim_header,
-#     comments="",
-#     fmt="%1.2f",
-# )  # saves as text file, with some formatting
 
 
 # # #get surface vars
@@ -372,7 +501,7 @@ print("fire_ignition_end_y1 = %s" % gridy[ige[0], ige[1]])
 # # #save sounding data input field
 # sounding_header = " ".join(map(str, surface))
 # np.savetxt(
-#     str(root_dir) + "/data/wrfinput/input_sounding",
+#     str(save_dir) + "/input_sounding",
 #     sounding,
 #     header=sounding_header,
 #     comments="",
