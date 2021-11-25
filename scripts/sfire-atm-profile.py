@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import numpy as np
 import pandas as pd
+from scipy.interpolate import interp1d
 
 from metpy.calc import wind_components, mixing_ratio_from_relative_humidity
 
@@ -16,9 +17,15 @@ from context import data_dir
 
 user = "crodell"
 file = "2019-05-11_1456"
+flux_filein = str(data_dir) + "/obs/met/"
 # filein  = '/Users/'+user+'/Google Drive File Stream/Shared drives/Research/CRodell/Pelican_Mnt_Fire/Data/windsond/'+file+'.sounding.csv'
 # save    = '/Users/'+user+'/Google Drive File Stream/Team Drives/research/CRodell/Pelican_Mnt_Fire/Images/'
 
+
+df = pd.read_csv(str(flux_filein) + f"{'south_met'}.csv")
+df["DateTime"] = pd.to_datetime(df["TIMESTAMP"], infer_datetime_format=True)
+# df = df.set_index("DateTime")[str(times[0]) : str(times[-1])]
+wsp = df[" WS_ms"]
 
 ylabel = 14
 fig_size = 20
@@ -98,14 +105,34 @@ label = 12
 fig_size = 20
 tick_size = 12
 title_size = 16
+Z_final = np.arange(20, 4020, 20)
+
+
+def inter(array):
+    interpfLES = interp1d(Z, array, fill_value="extrapolate")
+    interp_array = interpfLES(Z_final)
+    return interp_array
 
 
 ## make wrrf les input_sounding
-T = np.squeeze(np.array(temp) + 273.15)
+T = np.squeeze(np.array(theta))
 Q = np.squeeze(np.array(w))
 U = np.squeeze(np.array(u_si))
+u_ran = np.random.uniform(low=-0.3, high=0.3, size=(50,))
+U[:50] = u_ran
 V = np.squeeze(np.array(v_si))
-sounding = np.column_stack((Z, T, Q, U, V))
+v_ran = np.random.uniform(low=2, high=3, size=(50,))
+V[:50] = 3
+
+T = inter(T)
+Q = inter(Q)
+U = inter(U)
+V = inter(V)
+
+temp = inter(temp)
+wsp_kh = inter(wsp_kh)
+
+sounding = np.column_stack((Z_final, T, Q, U, V))
 
 # #get surface vars
 surface = [
@@ -135,8 +162,8 @@ fig.suptitle(
     "Atmospheric Profile \n Pelican Mountain 11 May 2019 1500 MDT", fontsize=16
 )
 
-ax[0].plot(temp, height, color="red", linewidth=4)
-ax[0].plot(temp, height, color="red", linewidth=4)
+ax[0].plot(temp, Z_final, color="red", linewidth=4)
+ax[0].plot(temp, Z_final, color="red", linewidth=4)
 ax[0].axhline(y=2395, color="black", linestyle="-")
 
 ax[0].set_ylabel("Height (meters)", fontsize=label)
@@ -145,7 +172,7 @@ ax[0].xaxis.grid(color="gray", linestyle="dashed")
 ax[0].yaxis.grid(color="gray", linestyle="dashed")
 # ax[0].set_facecolor('lightgrey')
 
-ax[1].plot(theta - 273.15, height, color="purple", linewidth=4)
+ax[1].plot(T - 273.15, Z_final, color="purple", linewidth=4)
 ax[1].set_xlabel("Potential Temperature (C)", fontsize=label)
 ax[1].axhline(y=2395, color="black", linestyle="-")
 ax[1].set_yticklabels([])
@@ -153,19 +180,19 @@ ax[1].xaxis.grid(color="gray", linestyle="dashed")
 ax[1].yaxis.grid(color="gray", linestyle="dashed")
 # ax[1].set_facecolor('lightgrey')
 
-ax[2].plot(rh, height, color="green", linewidth=4)
-ax[2].set_xlabel("Relative Humidity (%)", fontsize=label)
-ax[2].axhline(y=2395, color="black", linestyle="-")
-ax[2].set_yticklabels([])
-ax[2].xaxis.grid(color="gray", linestyle="dashed")
-ax[2].yaxis.grid(color="gray", linestyle="dashed")
+# ax[2].plot(rh, height, color="green", linewidth=4)
+# ax[2].set_xlabel("Relative Humidity (%)", fontsize=label)
+# ax[2].axhline(y=2395, color="black", linestyle="-")
+# ax[2].set_yticklabels([])
+# ax[2].xaxis.grid(color="gray", linestyle="dashed")
+# ax[2].yaxis.grid(color="gray", linestyle="dashed")
 # ax[2].set_facecolor('lightgrey')
 
-one = np.ones_like(wsp_kh) * 52
+one = np.ones_like(Z_final) * 52
 ax[3].barbs(
-    one[0::5], height[0::5], u[0::5], v[0::5], color="black", zorder=10, length=5
+    one[0::5], Z_final[0::5], U[0::5], V[0::5], color="black", zorder=10, length=5
 )
-ax[3].plot(wsp_kh, height, color="black", linewidth=4, zorder=1)
+ax[3].plot(wsp_kh, Z_final, color="black", linewidth=4, zorder=1)
 ax[3].set_xlim(0, 56)
 ax[3].axhline(y=2395, color="black", linestyle="-")
 ax[3].set_xlabel(r"Wind Speed $(\frac{km}{hr})$", fontsize=label)

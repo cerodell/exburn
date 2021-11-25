@@ -22,7 +22,7 @@ from utils.sfire import makeLL
 
 
 ##################### Define Inputs and File Directories ###################
-modelrun = "F6V51M08Z22"
+modelrun = "F6V51M08Z22B10"
 configid = "F6V51"
 domain = "met"
 # pm_ef = 21.05  # boreal wildfire emission factor Urbanski (2014)
@@ -46,7 +46,7 @@ aqs = config["unit5"]["obs"]["aq"]
 ros = config["unit5"]["obs"]["ros"]
 
 
-wrf_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
+wrf_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:48")
 wrf_ds = wrf_ds.sum("bottom_top")
 XLAT, XLONG = makeLL(domain, configid)
 times = wrf_ds.XTIME.values

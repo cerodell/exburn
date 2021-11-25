@@ -9,6 +9,7 @@ import geopandas as gpd
 from pathlib import Path
 from netCDF4 import Dataset
 from sklearn.neighbors import KDTree
+from scipy.interpolate import interp1d
 
 
 import matplotlib.pyplot as plt
@@ -20,18 +21,25 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from context import root_dir, vol_dir, data_dir, save_dir, gog_dir
 import matplotlib.pylab as pylab
 from utils.sfire import makeLL
+import matplotlib as mpl
 
 
 ##################### Define Inputs and File Directories ###################
-modelrun = "F6V51M08Z22B10"
+modelrun = "F6V51M08Z22I04T"
 configid = "F6V51"
 domain = "met"
+var = "tr17_1"
+# var = 'fire_smoke'
+
 # pm_ef = 21.05  # boreal wildfire emission factor Urbanski (2014)
 pm_ef = 10.400
-levels = np.arange(0, 1400.0, 10)
-# cmap = cm.Blues(np.linspace(0,1,len(levels)))
-# cmap = colors.ListedColormap(cmap[0:,:-1])
-cmap = "cubehelix_r"
+# levels = np.arange(0, 1200.0, 10)
+a = np.arange(1, 10)
+b = 10 ** np.arange(4)
+levels = (b[:, np.newaxis] * a).flatten()
+print(levels)
+cmap = mpl.cm.cubehelix_r
+norm = mpl.colors.BoundaryNorm(levels, cmap.N, extend="both")
 
 fireshape_path = str(data_dir) + "/unit_5/unit_5"
 aqsin = str(data_dir) + "/obs/aq/"
@@ -56,8 +64,8 @@ south_north = slice(110, 300, None)
 west_east = slice(30, 129, None)
 
 ## open wrf-sfire simulation
-wrf_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:48")
-wrf_ds["tr17_1"] = wrf_ds["tr17_1"] / pm_ef
+wrf_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
+wrf_ds[var] = wrf_ds[var] / pm_ef
 wrf_ds = wrf_ds.sel(
     south_north=south_north,
     west_east=west_east,
@@ -70,10 +78,10 @@ XLONG = XLONG.sel(south_north=south_north, west_east=west_east)
 
 
 ## get heights from wrf-simulation
-ncfile = Dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:48")
+ncfile = Dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
 height = wrf.getvar(ncfile, "height")
 height = height.values[:, 0, 0]
-# print(height)
+print(np.round(height))
 
 ## make datatime array
 times = wrf_ds.XTIME.values
@@ -102,17 +110,20 @@ def prep_aqs(aqin):
     pm_max = np.max(pm25)
     pm_min = np.min(pm25)
     df = df[str(times[0]) : str(times[-1])]
-    return df, aq_id, pm_max, pm_min
+    arg_max = np.argmax(df["pm25"])
+
+    return df, aq_id, pm_max, pm_min, arg_max
 
 
 ## loop all csv file open prepare and store sensor ID and max min obs values
-aq_ddxy, aq_ids, pm_maxs, pm_mins = [], [], [], []
+aq_ddxy, aq_ids, pm_maxs, pm_mins, arg_maxs = [], [], [], [], []
 for aqin in aqsin:
-    df, aq_id, pm_max, pm_min = prep_aqs(aqin)
+    df, aq_id, pm_max, pm_min, arg_max = prep_aqs(aqin)
     aq_ddxy.append(df)
     aq_ids.append(aq_id)
     pm_maxs.append(pm_max)
     pm_mins.append(pm_min)
+    arg_maxs.append(arg_max)
 
 
 ################### Find Nearest Model Grid to AQ Observations ###################
@@ -138,13 +149,31 @@ colors_list = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 # colors = iter(cm.tab20(np.linspace(0, 1, len(aq_ids))))
 
 ## Index wrf-sfire simulation for nearest model grid to aq sensors
-aq_ds = wrf_ds.tr17_1.sel(south_north=y, west_east=x).isel(bottom_top=0)
+aq_ds = wrf_ds[var].sel(south_north=y, west_east=x).isel(bottom_top=0)
+
+
+## Find boundary layer height
+# zstep = 10.
+# interpz =np.arange(0,2000,zstep)
+# temp = wrf_ds['T'].values[:,:,:,:] + 300
+# T0 = np.mean(temp,(0,2,3))
+# interpfLES= interp1d(height, T0,fill_value='extrapolate')
+# soundingLES = interpfLES(interpz)
+
+# gradTLES = (soundingLES[1:] - soundingLES[:-1])/zstep
+# gradT2 = gradTLES[1:] - gradTLES[:-1]
+# drop = 10
+# ziidx = np.argmax(gradT2[drop:]) + drop
+# zi = interpz[ziidx]
+# print(zi)
+zi = 2400.0
 
 
 ################### Plot AQ Simulation to Observed Values ###################
+# %%
+fig = plt.figure(figsize=(10, 5.8))
 
-fig = plt.figure(figsize=(10, 5.5))
-fig.suptitle(modelrun)
+# fig.suptitle(modelrun)
 ## make subplot for timeseries of smoke at each AQ station compared to modeled smoke values
 ax = fig.add_subplot(2, 2, 4)
 modeld_aq = aq_ds.isel(aqs=2)
@@ -165,24 +194,34 @@ for i in range(len(aq_ids)):
         linestyle="--",
     )
 ax.scatter(
-    pd.Timestamp(2019, 5, 11, 17, 49, 3),
+    pd.Timestamp(2019, 5, 11, 17, 49, 48),
     0,
     marker="*",
-    color="red",
+    color="tab:red",
     zorder=10,
     label="Ignition Time",
+    edgecolors="black",
     s=100,
 )
 ax.set_title(
     f"Time Series of PM2.5 Concentration \n Dash Line: Observed and Solid Line: Modeled",
     fontsize=10,
 )
-ax.set_ylabel("PM2.5 \n (μg m^-3)", fontsize=10)
+ax.set_ylabel("PM2.5 \n" + r"($μg m^{-3}$)", fontsize=10)
 ax.set_xlabel("DateTime (HH:MM:SS)", fontsize=10)
 myFmt = DateFormatter("%H:%M:%S")
 ax.xaxis.set_major_formatter(myFmt)
 ax.tick_params(axis="x", labelrotation=20)
-
+ax.text(
+    0.015,
+    1.15,
+    "C)",
+    size=16,
+    color="k",
+    weight="bold",
+    zorder=10,
+    transform=plt.gca().transAxes,
+)
 
 ## make subplot for top view map of smoke at lowest model grid levels
 ax_map = fig.add_subplot(1, 2, 1)
@@ -210,54 +249,94 @@ for i in range(len(aq_ids)):
         s=100,
     )
 
-tr17_1 = (
-    wrf_ds["tr17_1"].sum(dim=["bottom_top"]).isel(Time=idx_max[np.argmax(value_max)])
-)
+tr17_1 = wrf_ds[var].sum(dim=["bottom_top"]).isel(Time=idx_max[np.argmax(value_max)])
 tiletime = str(times[idx_max[np.argmax(value_max)]])[:-10]
+
+off_time = (
+    times[idx_max[np.argmax(value_max)]]
+    - aq_ddxy[np.argmax(value_max)].index[arg_maxs[np.argmax(value_max)]]
+).total_seconds()
+off_mag = value_max[np.argmax(value_max)] - pm_maxs[np.argmax(value_max)]
+print(
+    f"Time difference of Modeled to Observed max PM2.5 concentrations {off_time} seconds"
+)
+print(f"Values difference of Modeled to Observed max PM2.5 concentrations {off_mag}")
+
+
 ax_map.set_title(f"Vertically Integrated Smoke \n at {tiletime}", fontsize=10)
 contour = ax_map.contourf(
-    XLONG, XLAT, tr17_1, zorder=1, levels=levels, cmap=cmap, extend="max"  # cubehelix_r
+    XLONG,
+    XLAT,
+    tr17_1,
+    zorder=1,
+    levels=levels,
+    cmap=cmap,
+    norm=norm,
+    extend="max",  # cubehelix_r
 )
 
 cbar = plt.colorbar(contour, ax=ax_map, pad=0.04, location="left")
 cbar.ax.tick_params(labelsize=10)
 cbar.set_label(
-    "PM2.5 Concentration  \n (μg m^-3)", rotation=90, fontsize=10, labelpad=15
+    "PM2.5 Concentration  \n" + r"($μg m^{-3}$)", rotation=90, fontsize=10, labelpad=15
 )
 
 shape = XLAT.shape
 dxy = 25
-ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 9))
+ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 6))
 labels = [item.get_text() for item in ax_map.get_xticklabels()]
 xlabels = np.arange(0, shape[1] * dxy, shape[1] * dxy / len(labels)).astype(int)
 ax_map.set_xticklabels(xlabels)
 
-ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 10))
+ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 8))
 labels = [item.get_text() for item in ax_map.get_yticklabels()]
 ylabels = np.arange(0, shape[0] * dxy, shape[0] * dxy / len(labels)).astype(int)
 ax_map.set_yticklabels(ylabels)
 ax_map.yaxis.tick_right()
 ax_map.yaxis.set_label_position("right")
-ax_map.set_xlabel("East-West (m)", fontsize=10)
-ax_map.set_ylabel("North-South (m)", fontsize=10)
+ax_map.set_xlabel("West-East (m)", fontsize=10)
+ax_map.set_ylabel("South-North (m)", fontsize=10)
+ax_map.text(
+    0.015,
+    1.05,
+    "A)",
+    size=16,
+    color="k",
+    weight="bold",
+    zorder=10,
+    transform=plt.gca().transAxes,
+)
 plt.legend()
 
 
 # make subplot for cross section of smoke
 ax = fig.add_subplot(2, 2, 2)
-tr17_1 = (
-    wrf_ds["tr17_1"].sum(dim=["west_east"]).isel(Time=idx_max[np.argmax(value_max)])
-)
+tr17_1 = wrf_ds[var].sum(dim=["west_east"]).isel(Time=idx_max[np.argmax(value_max)])
 sn = tr17_1.south_north * 25
-ax.set_title(f"Cross Wind Integrated Smoke at {tiletime}", fontsize=10)
+ax.set_title(f"Cross Wind Integrated Smoke \n at {tiletime}", fontsize=10)
 contour = ax.contourf(
-    sn, height, tr17_1, zorder=1, levels=levels, cmap=cmap, extend="max"
+    sn, height, tr17_1, zorder=1, levels=levels, cmap=cmap, norm=norm, extend="max"
 )
+# ax.axhline(y=zi, color='grey', linestyle='--', lw= 0.5, alpha = 0.6)
+# for i in range(len(aq_ids)):
+yy = y.values
+# ax.axvline(x=sn[yy[0]], color='grey', linestyle='--', lw= 0.5, alpha = 0.6)
+
 ax.set_ylabel("Vertical Height \n (m)", fontsize=10)
-ax.set_xlabel("East-West \n Horizontal (m)", fontsize=10)
+ax.set_xlabel("Horizontal (m)", fontsize=10)
 ax.tick_params(axis="both", which="major", labelsize=8)
-# ax.set_ylim(0, 3200)
-# ax.set_xlim(0, 3000)
+ax.text(
+    0.015,
+    1.1,
+    "B)",
+    size=16,
+    color="k",
+    weight="bold",
+    zorder=10,
+    transform=plt.gca().transAxes,
+)
+# ax.set_ylim(0, 100)
+# ax.set_xlim(0, 600)
 # cbar = plt.colorbar(contour, ax=ax, pad=0.01)
 # cbar.ax.tick_params(labelsize=10)
 # cbar.set_label("g kg^-1", rotation=270, fontsize=8, labelpad=15)

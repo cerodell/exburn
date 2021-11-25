@@ -18,7 +18,7 @@ import matplotlib
 
 matplotlib.rcParams.update({"font.size": 10})
 
-modelrun = "F6V51M08Z22I04"
+modelrun = "F6V51M08Z22"
 # configid = modelrun[:-6]
 configid = "F6V51"
 
@@ -62,14 +62,12 @@ dsi = ds.isel(
     west_east_subgrid=west_east_subgrid,
     south_north=south_north,
     west_east=west_east,
-    # Time=slice(0, 54, 6),
-    Time=20,
+    Time=slice(0, 54, 6),
     # fuel_moisture_classes_stag = 0
 )
 dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
-dsi.FMC_G.plot()
-# plt.savefig(str(save_dir) + "/FGRNHFX.png")
-
+U = dsi["U"].isel(bottom_top=1)
+U.plot(col="Time", col_wrap=3, cmap="coolwarm", extend="max", aspect=2, size=3)
 
 # %% [markdown]
 # Plot Gound Heat flux
@@ -80,7 +78,23 @@ dsi = ds.isel(
     Time=slice(0, 54, 6),
 )
 dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
-dsi.FGRNHFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
+dsi.FCANHFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
+plt.savefig(str(save_dir) + "/FCANHFX.png")
+
+# %% [markdown]
+# Plot Gound Heat flux
+# %%
+dsi = ds.isel(
+    south_north_subgrid=south_north_subgrid,
+    west_east_subgrid=west_east_subgrid,
+    Time=slice(
+        0,
+        60,
+    ),
+)
+
+dsi["Time"] = dsi.XTIME.values.astype("datetime64[s]")
+dsi.FGRNHFX.plot(col="Time", col_wrap=6, cmap="Reds", extend="max", aspect=2, size=3)
 plt.savefig(str(save_dir) + "/FGRNHFX.png")
 
 # %% [markdown]
@@ -103,12 +117,6 @@ dsi.FIRE_AREA.plot(
     col="Time", col_wrap=3, cmap="gist_heat_r", extend="max", aspect=2, size=3
 )
 plt.savefig(str(save_dir) + "/FIRE_AREA.png")
-
-# # %% [markdown]
-# # Plot Observed Fire Heat Flux
-# # %%
-# dsi.FIRE_HFX.plot(col="Time", col_wrap=3, cmap="Reds", extend="max", aspect=2, size=3)
-# plt.savefig(str(save_dir) + "/FIRE_HFX.png")
 
 
 # %% [markdown]
@@ -138,9 +146,6 @@ plt.savefig(str(save_dir) + "/tracer-vert-int.png")
 # %% [markdown]
 # Plot Max Temp crosssection
 # %%
-ncfile = Dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
-height = wrf.getvar(ncfile, "height")
-height = height.values[:, 0, 0]
 # interp_level = height
 # temp = wrf.getvar(ncfile, "temp", timeidx=wrf.ALL_TIMES)
 # dsi = temp.isel(south_north=south_north).max(dim=["west_east", "Time"])

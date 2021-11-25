@@ -29,7 +29,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 domain = "fire"
 unit = "unit5"
-ignition = "multi"
 modelrun = "F6V51M08Z22I04B10"
 configid = "F6V51"
 title = "Time of Arrival"
@@ -55,9 +54,8 @@ south_north_subgrid = slice(bounds["fire"]["sn"][0], bounds["fire"]["sn"][1])
 west_east_subgrid = slice(bounds["fire"]["we"][0], bounds["fire"]["we"][1])
 fs = bounds["namelist"]["dxy"] / bounds["namelist"]["fs"]
 
-# wrf_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/interp-unit5-temp.nc", chunks = 'auto')
 wrf_ds = xr.open_dataset(
-    str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11", chunks="auto"
+    str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:48", chunks="auto"
 )
 var_da = wrf_ds[var] / 1000
 var_da = var_da.sel(
