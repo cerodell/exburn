@@ -248,7 +248,7 @@ ax_map.set_title(f"Pelican Mountain Unit 5 Sensor Location", fontsize=16)
 
 fig.tight_layout()
 
-plt.savefig(str(save_dir) + f"/site-map.png", dpi=250)
+plt.savefig(str(save_dir) + f"/site-map.png", dpi=250, bbox_inches="tight")
 
 
 # contour = ax_map.contourf(

@@ -5,45 +5,67 @@ The style file: Definitions/mdpi.bst
 Database file #1: unit5.bib
 Warning--string name "jul" is undefined
 --line 14 of file unit5.bib
-You've used 1 entry,
+Warning--string name "jul" is undefined
+--line 33 of file unit5.bib
+Warning--string name "feb" is undefined
+--line 52 of file unit5.bib
+Warning--string name "feb" is undefined
+--line 70 of file unit5.bib
+Warning--string name "jul" is undefined
+--line 139 of file unit5.bib
+Warning--string name "sep" is undefined
+--line 158 of file unit5.bib
+Warning--string name "jul" is undefined
+--line 194 of file unit5.bib
+Warning--string name "aug" is undefined
+--line 245 of file unit5.bib
+Warning--string name "feb" is undefined
+--line 280 of file unit5.bib
+Warning--string name "aug" is undefined
+--line 298 of file unit5.bib
+Warning--string name "oct" is undefined
+--line 316 of file unit5.bib
+Warning--string name "apr" is undefined
+--line 370 of file unit5.bib
+You've used 16 entries,
             2862 wiz_defined-function locations,
-            567 strings with 4301 characters,
-and the built_in function-call counts, 528 in all, are:
-= -- 28
-> -- 57
-< -- 0
-+ -- 20
-- -- 18
-* -- 61
-:= -- 106
-add.period$ -- 4
-call.type$ -- 1
-change.case$ -- 1
-chr.to.int$ -- 1
-cite$ -- 1
-duplicate$ -- 18
-empty$ -- 30
-format.name$ -- 19
-if$ -- 96
+            682 strings with 9012 characters,
+and the built_in function-call counts, 7007 in all, are:
+= -- 504
+> -- 558
+< -- 6
++ -- 204
+- -- 172
+* -- 755
+:= -- 1206
+add.period$ -- 63
+call.type$ -- 16
+change.case$ -- 16
+chr.to.int$ -- 16
+cite$ -- 16
+duplicate$ -- 278
+empty$ -- 507
+format.name$ -- 192
+if$ -- 1373
 int.to.chr$ -- 1
-int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 9
-num.names$ -- 3
-pop$ -- 5
+int.to.str$ -- 16
+missing$ -- 14
+newline$ -- 98
+num.names$ -- 48
+pop$ -- 84
 preamble$ -- 0
-purify$ -- 1
+purify$ -- 16
 quote$ -- 0
-skip$ -- 8
+skip$ -- 134
 stack$ -- 0
-substring$ -- 8
-swap$ -- 4
-text.length$ -- 0
+substring$ -- 263
+swap$ -- 60
+text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 7
+type$ -- 112
 warning$ -- 0
-while$ -- 3
+while$ -- 52
 width$ -- 0
-write$ -- 16
-(There was 1 warning)
+write$ -- 226
+(There were 12 warnings)

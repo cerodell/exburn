@@ -367,4 +367,4 @@ ax_map.text(
 legend.set_zorder(102)
 legend.get_frame().set_facecolor("w")
 fig.tight_layout()
-plt.savefig(str(save_dir) + f"/wsp_wdir-comparison.png", dpi=250)
+plt.savefig(str(save_dir) + f"/wsp_wdir-comparison.png", dpi=250, bbox_inches="tight")

@@ -256,7 +256,7 @@ ax = fig.add_subplot(gs[1, 2])
 smoke = wrf_ds["tr17_1"].isel(south_north=sn_idx, west_east=ew_idx, Time=time_idx)
 ax.plot(smoke / pm_ef, height, color="green", linewidth=4)
 ax.set_yticklabels([])
-ax.set_xlabel(r"Wind Speed $(\frac{km}{hr})$", fontsize=14)
+ax.set_xlabel(r"PM2.5 Concenration $(\frac{μg}{m^{3}})$", fontsize=14)
 ax.set_yticklabels([])
 ax.xaxis.grid(color="gray", linestyle="dashed")
 ax.yaxis.grid(color="gray", linestyle="dashed")
@@ -306,4 +306,4 @@ fig.suptitle(
 
 fig.tight_layout()
 
-plt.savefig(str(save_dir) + f"/simulated-sounding.png", dpi=250)
+plt.savefig(str(save_dir) + f"/simulated-sounding.png", dpi=250, bbox_inches="tight")

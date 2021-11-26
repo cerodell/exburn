@@ -25,7 +25,7 @@ import matplotlib as mpl
 
 
 ##################### Define Inputs and File Directories ###################
-modelrun = "F6V51M08Z22I04T"
+modelrun = "F6V51M08Z22"
 configid = "F6V51"
 domain = "met"
 var = "tr17_1"
@@ -342,6 +342,6 @@ ax.text(
 # cbar.set_label("g kg^-1", rotation=270, fontsize=8, labelpad=15)
 
 fig.tight_layout()
-plt.savefig(str(save_dir) + f"/smoke-aq-comparison.png", dpi=250)
+plt.savefig(str(save_dir) + f"/smoke-aq-comparison.png", dpi=250, bbox_inches="tight")
 
 # # aq2m_ds = aq_ds.isel(z = 0)

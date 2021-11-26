@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 domain = "fire"
 unit = "unit5"
-modelrun = "F6V51M08Z22"
+modelrun = "F6V51M08Z22I04T"
 from pylab import *
 
 levels_ros = np.arange(10, 500, 20)
@@ -463,7 +463,7 @@ def plotstuff(i):
 [plotstuff(i) for i in range(len(cols))]
 
 # fig.tight_layout()
-plt.savefig(str(save_dir) + f"/ros-timeseries.png", dpi=300)
+plt.savefig(str(save_dir) + f"/ros-timeseries.png", dpi=300, bbox_inches="tight")
 
 
 # fig = plt.figure(figsize=(6, 4))

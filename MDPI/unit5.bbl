@@ -1,5 +1,88 @@
 \begin{thebibliography}{999}
 
+\bibitem[Kochanski \em{et~al.}(2018)Kochanski, Fournier, and
+  Mandel]{kochanski_experimental_2018}
+Kochanski, A.; Fournier, A.; Mandel, J.
+\newblock Experimental {Design} of a {Prescribed} {Burn} {Instrumentation}.
+\newblock {\em Atmosphere} {\bf 2018}, {\em 9},~296.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/atmos9080296}{\detokenize{10.3390/atmos9080296}}}.
+
+\bibitem[Mallia \em{et~al.}(2020)Mallia, Kochanski, Urbanski, Mandel, Farguell,
+  and Krueger]{mallia_incorporating_2020}
+Mallia, D.V.; Kochanski, A.K.; Urbanski, S.P.; Mandel, J.; Farguell, A.;
+  Krueger, S.K.
+\newblock Incorporating a {Canopy} {Parameterization} within a {Coupled}
+  {Fire}-{Atmosphere} {Model} to {Improve} a {Smoke} {Simulation} for a
+  {Prescribed} {Burn}.
+\newblock {\em Atmosphere} {\bf 2020}, {\em 11},~832.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/atmos11080832}{\detokenize{10.3390/atmos11080832}}}.
+
+\bibitem[Moisseeva and Stull(2019)]{moisseeva_capturing_2019}
+Moisseeva, N.; Stull, R.
+\newblock Capturing {Plume} {Rise} and {Dispersion} with a {Coupled}
+  {Large}-{Eddy} {Simulation}: {Case} {Study} of a {Prescribed} {Burn}.
+\newblock {\em Atmosphere} {\bf 2019}, {\em 10},~579.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/atmos10100579}{\detokenize{10.3390/atmos10100579}}}.
+
+\bibitem[Kochanski \em{et~al.}(2013)Kochanski, Jenkins, Mandel, Beezley,
+  Clements, and Krueger]{kochanski_evaluation_2013}
+Kochanski, A.K.; Jenkins, M.A.; Mandel, J.; Beezley, J.D.; Clements, C.B.;
+  Krueger, S.
+\newblock Evaluation of {WRF}-{SFIRE} performance with field observations from
+  the {FireFlux} experiment.
+\newblock {\em Geosci. Model Dev.} {\bf 2013}, {\em 6},~1109--1126.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/gmd-6-1109-2013}{\detokenize{10.5194/gmd-6-1109-2013}}}.
+
+\bibitem[Coen(2018)]{coen_requirements_2018}
+Coen, J.
+\newblock Some {Requirements} for {Simulating} {Wildland} {Fire} {Behavior}
+  {Using} {Insight} from {Coupled} {Weather}—{Wildland} {Fire} {Models}.
+\newblock {\em Fire} {\bf 2018}, {\em 1},~6.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/fire1010006}{\detokenize{10.3390/fire1010006}}}.
+
+\bibitem[Thompson \em{et~al.}(2020)Thompson, Schroeder, Wilkinson, Barber,
+  Baxter, Cameron, Hsieh, Marshall, Moore, Refai, Rodell, Schiks, Verkaik, and
+  Zerb]{thompson_recent_2020}
+Thompson, D.K.; Schroeder, D.; Wilkinson, S.L.; Barber, Q.; Baxter, G.;
+  Cameron, H.; Hsieh, R.; Marshall, G.; Moore, B.; Refai, R.; Rodell, C.;
+  Schiks, T.; Verkaik, G.J.; Zerb, J.
+\newblock Recent {Crown} {Thinning} in a {Boreal} {Black} {Spruce} {Forest}
+  {Does} {Not} {Reduce} {Spread} {Rate} nor {Total} {Fuel} {Consumption}:
+  {Results} from an {Experimental} {Crown} {Fire} in {Alberta}, {Canada}.
+\newblock {\em Fire} {\bf 2020}, {\em 3},~28.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/fire3030028}{\detokenize{10.3390/fire3030028}}}.
+
+\bibitem[Mandel \em{et~al.}(2011)Mandel, Beezley, and
+  Kochanski]{mandel_coupled_2011}
+Mandel, J.; Beezley, J.D.; Kochanski, A.K.
+\newblock Coupled atmosphere-wildland fire modeling with {WRF} 3.3 and {SFIRE}
+  2011.
+\newblock {\em Geosci. Model Dev.} {\bf 2011}, {\em 4},~591--610.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/gmd-4-591-2011}{\detokenize{10.5194/gmd-4-591-2011}}}.
+
+\bibitem[Mandel \em{et~al.}(2014)Mandel, Amram, Beezley, Kelman, Kochanski,
+  Kondratenko, Lynn, Regev, and Vejmelka]{mandel_recent_2014}
+Mandel, J.; Amram, S.; Beezley, J.D.; Kelman, G.; Kochanski, A.K.; Kondratenko,
+  V.Y.; Lynn, B.H.; Regev, B.; Vejmelka, M.
+\newblock Recent advances and applications of {WRF}–{SFIRE}.
+\newblock {\em Nat. Hazards Earth Syst. Sci.} {\bf 2014}, {\em 14},~2829--2845.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/nhess-14-2829-2014}{\detokenize{10.5194/nhess-14-2829-2014}}}.
+
+\bibitem[Thompson(2020)]{thompson_data_2020}
+Thompson, D.K.
+\newblock Wildfire behaviour data for an experimental crown fire in thinned
+  boreal black spruce, Alberta, Canada, 2019-05-11,  2020.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5281/zenodo.3925794}{\detokenize{10.5281/zenodo.3925794}}}.
+
 \bibitem[Huda \em{et~al.}(2020)Huda, Lyder, Collins, Schroeder, Thompson,
   Marshall, Leon, Hidalgo, and Hossain]{huda_study_2020}
 Huda, Q.; Lyder, D.; Collins, M.; Schroeder, D.; Thompson, D.K.; Marshall, G.;
@@ -10,5 +93,60 @@ Huda, Q.; Lyder, D.; Collins, M.; Schroeder, D.; Thompson, D.K.; Marshall, G.;
 \newblock {\em Fire} {\bf 2020}, {\em 3},~30.
 \newblock
   doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/fire3030030}{\detokenize{10.3390/fire3030030}}}.
+
+\bibitem[Muñoz‐Esparza \em{et~al.}(2018)Muñoz‐Esparza, Kosović,
+  Jiménez, and Coen]{munozesparza_accurate_2018}
+Muñoz‐Esparza, D.; Kosović, B.; Jiménez, P.A.; Coen, J.L.
+\newblock An {Accurate} {Fire}‐{Spread} {Algorithm} in the {Weather}
+  {Research} and {Forecasting} {Model} {Using} the {Level}‐{Set} {Method}.
+\newblock {\em J. Adv. Model. Earth Syst.} {\bf 2018}, {\em 10},~908--926.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.1002/2017MS001108}{\detokenize{10.1002/2017MS001108}}}.
+
+\bibitem[Anderson(1982)]{anderson_aids_1982}
+Anderson, H.E.
+\newblock Aids to determining fuel models for estimating fire behavior.
+\newblock Technical Report INT-GTR-122, U.S. Department of Agriculture, Forest
+  Service, Intermountain Forest and Range Experiment Station, Ogden, UT,  1982.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.2737/INT-GTR-122}{\detokenize{10.2737/INT-GTR-122}}}.
+
+\bibitem[Prichard \em{et~al.}(2020)Prichard, O'Neill, Eagle, Andreu, Drye,
+  Dubowy, Urbanski, and Strand]{prichard_wildland_2020}
+Prichard, S.J.; O'Neill, S.M.; Eagle, P.; Andreu, A.G.; Drye, B.; Dubowy, J.;
+  Urbanski, S.; Strand, T.M.
+\newblock Wildland fire emission factors in {North} {America}: synthesis of
+  existing data, measurement needs and management applications.
+\newblock {\em Int. J. Wildland Fire} {\bf 2020}, {\em 29},~132.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.1071/WF19066}{\detokenize{10.1071/WF19066}}}.
+
+\bibitem[Moisseeva and Stull(2021)]{moisseeva_wildfire_2021}
+Moisseeva, N.; Stull, R.
+\newblock Wildfire smoke-plume rise: a simple energy balance parameterization.
+\newblock {\em Atmos. Chem. Phys.} {\bf 2021}, {\em 21},~1407--1425.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/acp-21-1407-2021}{\detokenize{10.5194/acp-21-1407-2021}}}.
+
+\bibitem[Clements \em{et~al.}(2016)Clements, Lareau, Seto, Contezac, Davis,
+  Teske, Zajkowski, Hudak, Bright, Dickinson, Butler, Jimenez, and
+  Hiers]{clements_fire_2016}
+Clements, C.B.; Lareau, N.P.; Seto, D.; Contezac, J.; Davis, B.; Teske, C.;
+  Zajkowski, T.J.; Hudak, A.T.; Bright, B.C.; Dickinson, M.B.; Butler, B.W.;
+  Jimenez, D.; Hiers, J.K.
+\newblock Fire weather conditions and fire–atmosphere interactions observed
+  during low-intensity prescribed fires – {RxCADRE} 2012.
+\newblock {\em Int. J. Wildland Fire} {\bf 2016}, {\em 25},~90.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.1071/WF14173}{\detokenize{10.1071/WF14173}}}.
+
+\bibitem[Bessardon \em{et~al.}(2019)Bessardon, Fosu-Amankwah, Petersson, and
+  Brooks]{bessardon_evaluation_2019}
+Bessardon, G.E.Q.; Fosu-Amankwah, K.; Petersson, A.; Brooks, B.J.
+\newblock Evaluation of {Windsond} {S1H2} performance in {Kumasi} during the
+  2016 {DACCIWA} field campaign.
+\newblock {\em Atmos. Meas. Tech.} {\bf 2019}, {\em 12},~1311--1324.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/amt-12-1311-2019}{\detokenize{10.5194/amt-12-1311-2019}}}.
 
 \end{thebibliography}
