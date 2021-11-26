@@ -19,14 +19,6 @@ Mallia, D.V.; Kochanski, A.K.; Urbanski, S.P.; Mandel, J.; Farguell, A.;
 \newblock
   doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/atmos11080832}{\detokenize{10.3390/atmos11080832}}}.
 
-\bibitem[Moisseeva and Stull(2019)]{moisseeva_capturing_2019}
-Moisseeva, N.; Stull, R.
-\newblock Capturing {Plume} {Rise} and {Dispersion} with a {Coupled}
-  {Large}-{Eddy} {Simulation}: {Case} {Study} of a {Prescribed} {Burn}.
-\newblock {\em Atmosphere} {\bf 2019}, {\em 10},~579.
-\newblock
-  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/atmos10100579}{\detokenize{10.3390/atmos10100579}}}.
-
 \bibitem[Kochanski \em{et~al.}(2013)Kochanski, Jenkins, Mandel, Beezley,
   Clements, and Krueger]{kochanski_evaluation_2013}
 Kochanski, A.K.; Jenkins, M.A.; Mandel, J.; Beezley, J.D.; Clements, C.B.;
@@ -120,6 +112,14 @@ Prichard, S.J.; O'Neill, S.M.; Eagle, P.; Andreu, A.G.; Drye, B.; Dubowy, J.;
 \newblock {\em Int. J. Wildland Fire} {\bf 2020}, {\em 29},~132.
 \newblock
   doi:{\changeurlcolor{black}\href{https://doi.org/10.1071/WF19066}{\detokenize{10.1071/WF19066}}}.
+
+\bibitem[Moisseeva and Stull(2019)]{moisseeva_capturing_2019}
+Moisseeva, N.; Stull, R.
+\newblock Capturing {Plume} {Rise} and {Dispersion} with a {Coupled}
+  {Large}-{Eddy} {Simulation}: {Case} {Study} of a {Prescribed} {Burn}.
+\newblock {\em Atmosphere} {\bf 2019}, {\em 10},~579.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/atmos10100579}{\detokenize{10.3390/atmos10100579}}}.
 
 \bibitem[Moisseeva and Stull(2021)]{moisseeva_wildfire_2021}
 Moisseeva, N.; Stull, R.
