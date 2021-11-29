@@ -1,3 +1,4 @@
-# phd-comps
-Stull, Howard, Austin
-/Users/crodell/phd-comps/scripts/sfire-interp.py >>  /Users/crodell/phd-comps/scripts/interp.log 2>&1
+# Exploratory simulations of experimental burns for instrumentation deployment.
+
+
+Experimental burns are expensive and require a great deal of planning and coordination. Logistical challenges compounded with lousy weather can result in cancelation and loss of critical data collection. The experiment burns are also ``one and done'' events, requiring well-thought-out instrumentation placement to observe desired coupled wildfire-atmosphere characteristics. We explore whether forecast simulation of a coupled wildfire-atmosphere model at fine spatial, temporal resolution can inform quality instrumentation placement based on the predicted meteorologic conditions. We achieved this by employing an experimental burn in a black spruce forest as a case study. We affirmed that the model could reasonably predict the fire behavior, smoke emission, dispersion, and coupled feedbacks that transpired. This paper demonstrates how we configured the model and how we propose to use this configuration to collect vital observational data at future experimental burns.
