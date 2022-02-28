@@ -1,6 +1,6 @@
 This is BibTeX, Version 0.99d (TeX Live 2019)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
-The top-level auxiliary file: unit5-nm.aux
+The top-level auxiliary file: unit5.aux
 The style file: Definitions/mdpi.bst
 Database file #1: unit5.bib
 Warning--string name "jul" is undefined
@@ -27,45 +27,45 @@ Warning--string name "oct" is undefined
 --line 316 of file unit5.bib
 Warning--string name "apr" is undefined
 --line 370 of file unit5.bib
-You've used 16 entries,
+You've used 24 entries,
             2862 wiz_defined-function locations,
-            682 strings with 9018 characters,
-and the built_in function-call counts, 7007 in all, are:
-= -- 504
-> -- 558
-< -- 6
-+ -- 204
-- -- 172
-* -- 755
-:= -- 1206
-add.period$ -- 63
-call.type$ -- 16
-change.case$ -- 16
-chr.to.int$ -- 16
-cite$ -- 16
-duplicate$ -- 278
-empty$ -- 507
-format.name$ -- 192
-if$ -- 1373
-int.to.chr$ -- 1
-int.to.str$ -- 16
-missing$ -- 14
-newline$ -- 98
-num.names$ -- 48
-pop$ -- 84
+            726 strings with 11275 characters,
+and the built_in function-call counts, 9555 in all, are:
+= -- 716
+> -- 730
+< -- 11
++ -- 271
+- -- 222
+* -- 935
+:= -- 1634
+add.period$ -- 95
+call.type$ -- 24
+change.case$ -- 24
+chr.to.int$ -- 23
+cite$ -- 24
+duplicate$ -- 380
+empty$ -- 719
+format.name$ -- 258
+if$ -- 1909
+int.to.chr$ -- 2
+int.to.str$ -- 24
+missing$ -- 15
+newline$ -- 146
+num.names$ -- 72
+pop$ -- 159
 preamble$ -- 0
-purify$ -- 16
+purify$ -- 24
 quote$ -- 0
-skip$ -- 134
+skip$ -- 197
 stack$ -- 0
-substring$ -- 263
-swap$ -- 60
+substring$ -- 285
+swap$ -- 80
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 112
+type$ -- 168
 warning$ -- 0
-while$ -- 52
+while$ -- 69
 width$ -- 0
-write$ -- 226
+write$ -- 338
 (There were 12 warnings)

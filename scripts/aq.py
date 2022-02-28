@@ -25,7 +25,7 @@ import matplotlib as mpl
 
 
 ##################### Define Inputs and File Directories ###################
-modelrun = "F6V51M08Z22"
+modelrun = "F6V51M08Z22D59I04"
 configid = "F6V51"
 domain = "met"
 var = "tr17_1"
@@ -207,7 +207,7 @@ ax.set_title(
     f"Time Series of PM2.5 Concentration \n Dash Line: Observed and Solid Line: Modeled",
     fontsize=10,
 )
-ax.set_ylabel("PM2.5 \n" + r"($μg m^{-3}$)", fontsize=10)
+ax.set_ylabel("PM2.5 \n" + r"($\mathrm{~μg} \mathrm{~m}^{-3}$)", fontsize=10)
 ax.set_xlabel("DateTime (HH:MM:SS)", fontsize=10)
 myFmt = DateFormatter("%H:%M:%S")
 ax.xaxis.set_major_formatter(myFmt)
@@ -278,19 +278,26 @@ contour = ax_map.contourf(
 cbar = plt.colorbar(contour, ax=ax_map, pad=0.04, location="left")
 cbar.ax.tick_params(labelsize=10)
 cbar.set_label(
-    "PM2.5 Concentration  \n" + r"($μg m^{-3}$)", rotation=90, fontsize=10, labelpad=15
+    "PM2.5 Concentration  \n" + r"($\mathrm{~μg} \mathrm{~m}^{-3}$)",
+    rotation=90,
+    fontsize=10,
+    labelpad=15,
 )
 
 shape = XLAT.shape
 dxy = 25
-ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 6))
+test = wrf_ds.west_east * 25
+# ax_map.set_xticks(test)
+ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 5))
 labels = [item.get_text() for item in ax_map.get_xticklabels()]
 xlabels = np.arange(0, shape[1] * dxy, shape[1] * dxy / len(labels)).astype(int)
+xlabels = [0, 500, 1000, 1500, 2000]
 ax_map.set_xticklabels(xlabels)
 
-ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 8))
+ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 5))
 labels = [item.get_text() for item in ax_map.get_yticklabels()]
 ylabels = np.arange(0, shape[0] * dxy, shape[0] * dxy / len(labels)).astype(int)
+ylabels = [0, 1000, 2000, 3000, 4000]
 ax_map.set_yticklabels(ylabels)
 ax_map.yaxis.tick_right()
 ax_map.yaxis.set_label_position("right")
@@ -336,7 +343,7 @@ ax.text(
     transform=plt.gca().transAxes,
 )
 # ax.set_ylim(0, 100)
-# ax.set_xlim(0, 600)
+ax.set_xlim(0, 4000)
 # cbar = plt.colorbar(contour, ax=ax, pad=0.01)
 # cbar.ax.tick_params(labelsize=10)
 # cbar.set_label("g kg^-1", rotation=270, fontsize=8, labelpad=15)

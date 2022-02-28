@@ -19,7 +19,7 @@ from context import root_dir, data_dir, save_dir
 from utils.sfire import makeLL
 
 ##################### Define Inputs and File Directories ###################
-modelrun = "F6V51M08Z22I04T"
+modelrun = "F6V51M08Z22"
 configid = "F6V51"
 domain = "met"
 levels = np.arange(0, 10.0, 0.1)
@@ -63,7 +63,7 @@ west_east = slice(bounds[domain]["we"][0], bounds[domain]["we"][1])
 # south_north = slice(100, 300, None)
 # west_east = slice(30, 129, None)
 south_north = slice(100, 140, None)
-west_east = slice(60, 89, None)
+west_east = slice(60, 90, None)
 south_north_subgrid = slice(555, 610, None)
 west_east_subgrid = slice(335, 400, None)
 
@@ -189,11 +189,11 @@ ax = fig.add_subplot(2, 2, 2)
 ax_hx = ax.twinx()
 ax_hx.plot(var_da.XTIME, var_da / 1000, color="tab:red", lw=0.8, zorder=8)
 ax_hx.set_ylabel(
-    "Fire Integrated \n Heatflux " + r"$(kW m^{-2})$" + "\n",
+    "Fire Integrated  \n Heat Flux  \n " + r"$(\mathrm{~kW} \mathrm{~m}^{-2})$" + "\n",
     fontsize=9,
     color="tab:red",
     rotation=-90,
-    labelpad=30,
+    labelpad=40,
 )
 ax_hx.tick_params(axis="y", colors="tab:red")
 
@@ -258,7 +258,11 @@ ax.plot(
     lw=1.5,
 )
 ax.plot(df_met.index, df_met[" WS_ms"], color="tab:blue", lw=1.5, linestyle="--")
-ax.set_ylabel("Wind Speed \n" + r"($m s^{-1}$)" + "\n", fontsize=9, color="tab:blue")
+ax.set_ylabel(
+    "Wind Speed \n" + r"($\mathrm{~m} \mathrm{~s}^{-1}$)" + "\n",
+    fontsize=9,
+    color="tab:blue",
+)
 ax.tick_params(axis="y", colors="tab:blue")
 ax.set_xlabel("DateTime (HH:MM:SS)", fontsize=10)
 myFmt = DateFormatter("%H:%M:%S")
@@ -278,11 +282,11 @@ ax.scatter(
 ax_hx = ax.twinx()
 ax_hx.plot(var_da.XTIME, var_da / 1000, color="tab:red", lw=0.8, zorder=8)
 ax_hx.set_ylabel(
-    "Fire Integrated \n Heatflux " + r"$(kW m^{-2})$" + "\n",
+    "Fire Integrated \n Heat Flux \n" + r"$(\mathrm{~kW} \mathrm{~m}^{-2})$" + "\n",
     fontsize=9,
     color="tab:red",
     rotation=-90,
-    labelpad=30,
+    labelpad=40,
 )
 ax_hx.tick_params(axis="y", colors="tab:red")
 
@@ -331,16 +335,22 @@ ax_map.streamplot(
 
 cbar = plt.colorbar(contour, ax=ax_map, pad=0.04, location="left")
 cbar.ax.tick_params(labelsize=10)
-cbar.set_label("Wind Speed \n" + r"($m s^{-1}$)", rotation=90, fontsize=10, labelpad=15)
+cbar.set_label(
+    "Wind Speed \n" + r"($\mathrm{~m} \mathrm{~s}^{-1}$)",
+    rotation=90,
+    fontsize=10,
+    labelpad=15,
+)
 
 shape = XLAT.shape
 dxy = 25
-ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 9))
+ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, int(len(wsp615cm.west_east) / 3)))
 labels = [item.get_text() for item in ax_map.get_xticklabels()]
 xlabels = np.arange(0, shape[1] * dxy, shape[1] * dxy / len(labels)).astype(int)
+# xlabels = [0, 100, 200, 300, 400, 500, 600, 700]
 ax_map.set_xticklabels(xlabels)
 
-ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 10))
+ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, int(len(wsp615cm.south_north) / 4)))
 labels = [item.get_text() for item in ax_map.get_yticklabels()]
 ylabels = np.arange(0, shape[0] * dxy, shape[0] * dxy / len(labels)).astype(int)
 ax_map.set_yticklabels(ylabels)

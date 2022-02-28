@@ -17,13 +17,14 @@ import pyproj as pyproj
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from context import root_dir, data_dir, save_dir
+from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pylab as pylab
 import matplotlib.colors as colors
 from utils.sfire import makeLL
 
 
 ##################### Define Inputs and File Directories ###################
-modelrun = "F6V51M08Z22I04"
+modelrun = "F6V51M08Z22"
 configid = "F6V51"
 domain = "met"
 fireshape_path = str(data_dir) + "/unit_5/unit_5"
@@ -35,9 +36,28 @@ save_dir.mkdir(parents=True, exist_ok=True)
 var = "wsp"
 title = "Wind Speed 10m"
 units = "m s^-1"
-cmap = "coolwarm"
 levels = np.arange(0, 10.0, 0.1)
-
+colors = [
+    "#FFFFFF",
+    "#BBBBBB",
+    "#646464",
+    "#1563D3",
+    "#2883F1",
+    "#50A5F5",
+    "#97D3FB",
+    "#0CA10D",
+    "#37D33C",
+    "#97F58D",
+    "#B5FBAB",
+    "#FFE978",
+    "#FFC03D",
+    "#FFA100",
+    "#FF3300",
+    "#C10000",
+    "#960007",
+    "#643C32",
+]
+cmap = LinearSegmentedColormap.from_list("meteoblue", colors, N=len(levels))
 
 # with open(str(root_dir) + "/json/config.json") as f:
 #     config = json.load(f)
@@ -45,6 +65,7 @@ levels = np.arange(0, 10.0, 0.1)
 # ros = config["unit5"]["obs"]["ros"]
 south_north = slice(100, 140, None)
 west_east = slice(60, 89, None)
+time_slice = slice(0, 100)
 # south_north = slice(50, 300, None)
 # west_east = slice(10, 140, None)
 
@@ -53,12 +74,18 @@ west_east = slice(60, 89, None)
 ncfile = Dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
 wspd_wdir = wrf.getvar(ncfile, "uvmet10_wspd_wdir", wrf.ALL_TIMES)
 uvmet10 = wrf.getvar(ncfile, "uvmet10", wrf.ALL_TIMES)
-u10 = uvmet10.sel(u_v="u").isel(south_north=south_north, west_east=west_east)
-v10 = uvmet10.sel(u_v="v").isel(south_north=south_north, west_east=west_east)
-wdir = wspd_wdir.sel(wspd_wdir="wdir").isel(
-    south_north=south_north, west_east=west_east
+u10 = uvmet10.sel(u_v="u").isel(
+    south_north=south_north, west_east=west_east, Time=time_slice
 )
-wsp = wspd_wdir.sel(wspd_wdir="wspd").isel(south_north=south_north, west_east=west_east)
+v10 = uvmet10.sel(u_v="v").isel(
+    south_north=south_north, west_east=west_east, Time=time_slice
+)
+wdir = wspd_wdir.sel(wspd_wdir="wdir").isel(
+    south_north=south_north, west_east=west_east, Time=time_slice
+)
+wsp = wspd_wdir.sel(wspd_wdir="wspd").isel(
+    south_north=south_north, west_east=west_east, Time=time_slice
+)
 
 
 XLAT, XLONG = makeLL(domain, configid)
@@ -125,5 +152,5 @@ def update_plot(i):
 
 # fig.tight_layout()
 ani = animation.FuncAnimation(fig, update_plot, dimT, interval=3)
-ani.save(str(save_dir) + f"/{var}-topview.mp4", writer="ffmpeg", fps=10, dpi=250)
+ani.save(str(save_dir) + f"/{var}-topview.mp4", writer="ffmpeg", fps=6, dpi=250)
 plt.close()

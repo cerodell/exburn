@@ -38,8 +38,16 @@ cmap = mpl.cm.cubehelix_r
 norm = mpl.colors.BoundaryNorm(levels, cmap.N, extend="both")
 
 var = "tr17_1"
-units = "PM2.5 " + r"($μg m^{-3}$)"
-title = "Estimated Ballon Launch Location"
+units = "PM2.5 " + r"($\mathrm{~μg} \mathrm{~m}^{-3})$"
+title = (
+    r"$\bf{Estimated}$"
+    + " "
+    + r"$\bf{ Ballon}$"
+    + " "
+    + r"$\bf{ Launch}$"
+    + " "
+    + r"$\bf{ Location}$"
+)
 cmap = "cubehelix_r"
 
 
@@ -138,11 +146,13 @@ dxy = 25
 ax.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 5))
 labels = [item.get_text() for item in ax.get_xticklabels()]
 xlabels = np.arange(0, shape[1] * dxy, shape[1] * dxy / len(labels)).astype(int)
+xlabels = [0, 500, 1000, 1500, 2000]
 ax.set_xticklabels(xlabels)
 
-ax.set_yticks(np.linspace(bm.latmin, bm.latmax, 8))
+ax.set_yticks(np.linspace(bm.latmin, bm.latmax, 5))
 labels = [item.get_text() for item in ax.get_yticklabels()]
 ylabels = np.arange(0, shape[0] * dxy, shape[0] * dxy / len(labels)).astype(int)
+ylabels = [0, 1000, 2000, 3000, 4000]
 ax.set_yticklabels(ylabels)
 # ax.yaxis.tick_right()
 # ax.yaxis.set_label_position("right")
@@ -176,6 +186,7 @@ ax.axvline(sn[sn_idx], color="k", linestyle="dotted", lw=0.8)
 ax.set_ylabel("Vertical (m)", fontsize=14, labelpad=10)
 ax.set_xlabel("South-North (m)", fontsize=14, labelpad=10)
 ax.tick_params(axis="both", which="major", labelsize=12)
+ax.set_xlim(0, 4000)
 # hfx_i = hfx.isel(Time = hfx.sum(dim= 'south_north').argmax(dim = 'Time')+40)
 # ax_hx = ax.twinx()
 # ax_hx.plot(sn, hfx_i/1000, color = 'tab:red', lw = 0.8, zorder =10)
@@ -217,7 +228,7 @@ temp = index_var("temp", units="C")
 # ax.set_yticklabels([])
 ax.plot(temp, height, color="red", linewidth=4)
 ax.set_ylabel("Height (m)", fontsize=14)
-ax.set_xlabel("Temperature (C)", fontsize=14)
+ax.set_xlabel("Temperature \n (C)", fontsize=14)
 ax.xaxis.grid(color="gray", linestyle="dashed")
 ax.yaxis.grid(color="gray", linestyle="dashed")
 ax.text(
@@ -235,7 +246,7 @@ ax = fig.add_subplot(gs[1, 1])
 td = index_var("theta_e", units="C")
 ax.set_yticklabels([])
 ax.plot(td, height, color="purple", linewidth=4)
-ax.set_xlabel("Potential Temperature (C)", fontsize=14)
+ax.set_xlabel("Potential Temperature \n (C)", fontsize=14)
 ax.set_yticklabels([])
 ax.xaxis.grid(color="gray", linestyle="dashed")
 ax.yaxis.grid(color="gray", linestyle="dashed")
@@ -256,7 +267,9 @@ ax = fig.add_subplot(gs[1, 2])
 smoke = wrf_ds["tr17_1"].isel(south_north=sn_idx, west_east=ew_idx, Time=time_idx)
 ax.plot(smoke / pm_ef, height, color="green", linewidth=4)
 ax.set_yticklabels([])
-ax.set_xlabel(r"PM2.5 Concenration $(\frac{μg}{m^{3}})$", fontsize=14)
+ax.set_xlabel(
+    "PM2.5 Concenration \n" + r"($\mathrm{~μg} \mathrm{~m}^{-3})$", fontsize=14
+)
 ax.set_yticklabels([])
 ax.xaxis.grid(color="gray", linestyle="dashed")
 ax.yaxis.grid(color="gray", linestyle="dashed")
@@ -282,7 +295,7 @@ ax.set_yticklabels([])
 
 one = np.ones_like(height) * 28
 ax.barbs(one[0::4], height[0::4], U[0::4], V[0::4], color="black", zorder=10, length=5)
-ax.set_xlabel(r"Wind Speed $(\frac{km}{hr})$", fontsize=14)
+ax.set_xlabel("Wind Speed \n" + r"$(\mathrm{~km} \mathrm{~hr}^{-1})$", fontsize=14)
 ax.set_yticklabels([])
 ax.xaxis.grid(color="gray", linestyle="dashed")
 ax.yaxis.grid(color="gray", linestyle="dashed")

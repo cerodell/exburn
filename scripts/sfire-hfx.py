@@ -291,8 +291,8 @@ g2 = sns.boxplot(
     data=plot_df,
 )
 
-g2.set(title="Max Heatflux")
-ax.set_ylabel(r"$Heatflux$ $kW m^{-2}$")
+g2.set(title="Maximum Heat Flux")
+ax.set_ylabel("Heat Flux \n" + r"$(\mathrm{~kW} \mathrm{~m}^{-2})$")
 ax.set_xlabel("")
 plt.savefig(str(save_dir) + f"/hfx-comparison.png", dpi=250, bbox_inches="tight")
 

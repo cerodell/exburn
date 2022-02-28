@@ -1,62 +1,37 @@
 import context
-import wrf
 import json
-import pickle
 import numpy as np
-import pandas as pd
-import xarray as xr
-import geopandas as gpd
 from pathlib import Path
-from sklearn.neighbors import KDTree
-from sklearn.preprocessing import normalize
-from scipy.interpolate import griddata
-import matplotlib.colors as colors
-from matplotlib.pyplot import cm
-
-from matplotlib.dates import DateFormatter
-
-import glob
-
+from utils.sfire import makeLL
+import pyproj as pyproj
 import matplotlib.pyplot as plt
-from matplotlib import animation
 from mpl_toolkits.basemap import Basemap
 from context import root_dir, data_dir, save_dir
-from utils.sfire import makeLL
-import matplotlib
 import warnings
-from matplotlib.colors import LinearSegmentedColormap
 
-matplotlib.rcParams.update({"font.size": 10})
-warnings.filterwarnings("ignore", category=RuntimeWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
+# ============ INPUTS==============
 domain = "fire"
 unit = "unit5"
 modelrun = "F6V51M08Z22"
-from pylab import *
-
-levels_ros = np.arange(10, 500, 20)
-cmap = cm.get_cmap("tab20c", 20)  # PiYG
-
-hex = []
-for i in range(cmap.N):
-    rgba = cmap(i)
-    hex.append(matplotlib.colors.rgb2hex(rgba))
-cmap_ros = LinearSegmentedColormap.from_list("tab20c", hex, N=len(levels_ros))
-
-
 configid = "F6V51"
-title = "Time of Arrival"
-var = "FGRNHFX"
-ig_start = [55.7177497, -113.5713062]
-ig_end = [55.7177507, -113.5751922]
-v = np.arange(0, 201, 1)
-Cnorm = colors.Normalize(vmin=0, vmax=200)
-ros_filein = str(data_dir) + "/obs/ros/"
-fireshape_path = str(root_dir) + "/data/unit_5/unit_5"
-headers = ["day", "hour", "minute", "second", "temp"]
+ds = 25  # LES grid spacing
+fs = 5  # fire mesh ratio
+ndx = 160  # EW number of grids
+ndy = 400  # NS number of grids
+ll_utm = [
+    336524,
+    6174820,
+]  # lower left corner of the domain in UTM coordinates (meters)
+filein = str(save_dir) + "/SAT/test/1884739755f8400be5009eb79a98bb00/response.tiff"
+fireshape_path = str(root_dir) + "/data/all_units/mygeodata_merged"
+
 save_dir = Path(str(save_dir) + f"/{modelrun}/")
 save_dir.mkdir(parents=True, exist_ok=True)
+# ============ end of INPUTS==============
+
 
 with open(str(root_dir) + "/json/config.json") as f:
     config = json.load(f)
@@ -70,187 +45,244 @@ bounds = config["unit5"]["sfire"][configid]
 south_north_subgrid = slice(540, 760, None)
 west_east_subgrid = slice(220, 500, None)
 fs = bounds["namelist"]["dxy"] / bounds["namelist"]["fs"]
-
-ds = xr.open_zarr(str(data_dir) + "/wrfinput/SINGLELINE/fuel6.zarr")
-wrf_ds = xr.open_dataset(
-    str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11", chunks="auto"
-)
-
-var_da = wrf_ds[var]
-var_da = var_da.sel(
-    south_north_subgrid=south_north_subgrid,
-    west_east_subgrid=west_east_subgrid,
-    Time=slice(3, 50),
-)
-
-FUELS = ds.sel(XLAT=south_north_subgrid, XLONG=west_east_subgrid)
-times = var_da.XTIME.values
-
 XLAT, XLONG = makeLL(domain, configid)
-XLAT = XLAT.sel(
-    south_north_subgrid=south_north_subgrid, west_east_subgrid=west_east_subgrid
-)
-XLONG = XLONG.sel(
-    south_north_subgrid=south_north_subgrid, west_east_subgrid=west_east_subgrid
-)
 
 
-def prepare_df(rosin):
-    df = pd.read_csv(
-        glob.glob(ros_filein + f"{rosin}*.txt")[0],
-        sep="\t",
-        index_col=False,
-        skiprows=16,
-        names=headers,
-    )
-    df["year"], df["month"] = "2019", "05"
-    df = df[:-1]
-    df["DateTime"] = pd.to_datetime(
-        df[["year", "month"] + headers[:-1]], infer_datetime_format=True
-    )
-    df.drop(["year", "month"] + headers[:-1], axis=1, inplace=True)
-    df = df.set_index("DateTime")
-    df = df[~df.index.duplicated(keep="first")]
-    upsampled = df.resample("1S")
-    df = upsampled.interpolate(method="linear")
-    df = df[str(times[0]) : str(times[-1])]
-    df["DateTime"] = pd.to_datetime(df.index)
-    return df
+def plot_image(image, factor=1.0, clip_range=None, **kwargs):
+    """
+    Utility function for plotting RGB images.
+    """
+    if clip_range is not None:
+        ax.imshow(np.clip(image * factor, *clip_range), **kwargs)
+    else:
+        ax.imshow(image * factor, **kwargs)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    return
 
 
-ros_dfs = [prepare_df(s) for s in ros]
-dimT = len(ros_dfs[0])
+# fig = plt.figure(figsize=(8, 6))
+# ax = fig.add_subplot(1, 1, 1)
+# bm = Basemap(
+#     llcrnrlon=XLONG[0, 0]+0.0014,
+#     # llcrnrlon=XLONG[0, 0],
+#     llcrnrlat=XLAT[0, 0],
+#     urcrnrlon=XLONG[-1, -1],
+#     urcrnrlat=XLAT[-1, -1]+0.001,
+#     # urcrnrlat=XLAT[-1, -1],
+#     epsg=4326,
+#     ax=ax,
+# )
+# wesn = [XLONG[0, 0], XLONG[-1, -1],XLAT[0, 0], XLAT[-1, -1]]
+# # ax = fig.add_subplot(1,1,1, projection=ccrs.UTM(zone=12))
+# factor=3.5/255
+# clip_range=(0,1)
+# real = np.clip(plt.imread(filein) * factor, *clip_range)
+# real = real[::-1,:,:]
+# bm.imshow(real, zorder = 1, extent =wesn)
+
+# # polygons = bm.readshapefile(fireshape_path, name="units", drawbounds=True, zorder=10)
+# # shape = XLAT.shape
+# ax.set_xticks(np.round(np.linspace(bm.lonmin, bm.lonmax, 5),3))
+# # labels = [item.get_text() for item in ax.get_xticklabels()]
+# # xlabels = np.arange(0, shape[1] * fs, shape[1] * fs / len(labels)).astype(int)
+# # ax.set_xticklabels(xlabels, fontsize=11)
+
+# ax.set_yticks(np.round(np.linspace(bm.latmin, bm.latmax, 10),3))
+# # labels = [item.get_text() for item in ax.get_yticklabels()]
+# # ylabels = np.arange(0, shape[0] * fs, shape[0] * fs / len(labels)).astype(int)
+# # ax.set_yticklabels(ylabels, fontsize=11)
+# ax.set_xlabel("West-East (deg)", fontsize=12)
+# ax.set_ylabel("South-North (deg)", fontsize=12)
+# ax.grid(True, linestyle="--", lw=0.2, zorder=1)
+
+# ax.set_title(f"WRF SFIRE Domain \n Pelican Mountain Unit 5", fontsize=16)
+
+# fig.tight_layout()
+# ax.ticklabel_format(useOffset=False)
+# plt.savefig(str(save_dir) + f"/site-map-full.png", dpi=250, bbox_inches="tight")
 
 
-def normalize(y):
-    x = y / np.linalg.norm(y)
-    return x
+# %%
 
-
-cols = ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
 fig = plt.figure(figsize=(8, 6))
-ax_map = fig.add_subplot(1, 1, 1)
+ax = fig.add_subplot(1, 1, 1)
 bm = Basemap(
-    llcrnrlon=XLONG[0, 0],
+    llcrnrlon=XLONG[0, 0] + 0.0019,
+    # llcrnrlon=XLONG[0, 0],
     llcrnrlat=XLAT[0, 0],
     urcrnrlon=XLONG[-1, -1],
-    urcrnrlat=XLAT[-1, -1],
+    urcrnrlat=XLAT[-1, -1] + 0.001,
+    # urcrnrlat=XLAT[-1, -1],
     epsg=4326,
-    ax=ax_map,
+    ax=ax,
 )
-polygons = bm.readshapefile(fireshape_path, name="units", drawbounds=True, zorder=1)
-shape = XLAT.shape
-ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 10))
-labels = [item.get_text() for item in ax_map.get_xticklabels()]
-xlabels = np.arange(0, shape[1] * fs, shape[1] * fs / len(labels)).astype(int)
-ax_map.set_xticklabels(xlabels, fontsize=11)
+wesn = [XLONG[0, 0], XLONG[-1, -1], XLAT[0, 0], XLAT[-1, -1]]
+factor = 3.5 / 255
+clip_range = (0, 1)
+real = np.clip(plt.imread(filein) * factor, *clip_range)
+real = real[::-1, :, :]
+bm.imshow(real, zorder=1, extent=wesn)
 
-ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 5))
-labels = [item.get_text() for item in ax_map.get_yticklabels()]
-ylabels = np.arange(0, shape[0] * fs, shape[0] * fs / len(labels)).astype(int)
-ax_map.set_yticklabels(ylabels, fontsize=11)
-ax_map.set_xlabel("West-East (m)", fontsize=12)
-ax_map.set_ylabel("South-North (m)", fontsize=12)
-# ax_map.xaxis.grid(True, which='major')
-# ax_map.yaxis.grid(True, which='major')
-ax_map.grid(True, linestyle="--", lw=0.2, zorder=1)
-
-
-# ax_map.text(
-# 0.015, 1.1, 'A)', size=20, color="k", weight='bold', zorder=10, transform=plt.gca().transAxes
-# )
-
-for h in hfxs:
-    if h == list(hfxs)[-1]:
-        ax_map.scatter(
-            hfxs[h]["lon"],
-            hfxs[h]["lat"],
-            zorder=9,
-            s=30,
-            color="tab:orange",
-            marker=".",
-            label="Heatflux",
-        )
-    else:
-        ax_map.scatter(
-            hfxs[h]["lon"],
-            hfxs[h]["lat"],
-            zorder=9,
-            s=30,
-            color="tab:orange",
-            marker=".",
-        )
-
-for r in ros:
-    if r == list(ros)[-1]:
-        ax_map.scatter(
-            ros[r]["lon"],
-            ros[r]["lat"],
-            zorder=9,
-            s=10,
-            color="tab:green",
-            marker=".",
-            label="Thermocouples",
-        )
-    else:
-        ax_map.scatter(
-            ros[r]["lon"],
-            ros[r]["lat"],
-            zorder=9,
-            s=10,
-            color="tab:green",
-            marker=".",
-        )
-
-for aq in aqs:
-    if aq == list(aqs)[-1]:
-        ax_map.scatter(
-            aqs[aq]["lon"],
-            aqs[aq]["lat"],
-            zorder=10,
-            # label=aq_ids[i],
-            color="tab:red",
-            edgecolors="black",
-            marker="^",
-            s=100,
-            label="Air Quality Monitor",
-        )
-    else:
-        ax_map.scatter(
-            aqs[aq]["lon"],
-            aqs[aq]["lat"],
-            zorder=10,
-            # label=aq_ids[i],
-            color="tab:red",
-            edgecolors="black",
-            marker="^",
-            s=100,
-        )
-
-
-ax_map.scatter(
-    mets["south_met"]["lon"],
-    mets["south_met"]["lat"],
+polygons = bm.readshapefile(
+    fireshape_path,
+    name="units",
+    drawbounds=True,
     zorder=10,
-    edgecolors="black",
-    color="tab:blue",
-    marker="D",
-    s=80,
-    label="Met Tower",
+    color="tab:red",
+    linewidth=2,
 )
-legend = ax_map.legend(
-    loc="upper right",
-    ncol=1,
-    fancybox=True,
-    shadow=True,
-)
-ax_map.set_title(f"Pelican Mountain Unit 5 Sensor Location", fontsize=16)
+shape = XLAT.shape
+ax.set_xticks(np.round(np.linspace(bm.lonmin, bm.lonmax, 32), 3))
+# labels = [item.get_text() for item in ax.get_xticklabels()]
+# xlabels = np.arange(0, shape[1] * fs, shape[1] * fs / len(labels)).astype(int)
+# ax.set_xticklabels(xlabels-1000, fontsize=11)
+
+ax.set_yticks(np.round(np.linspace(bm.latmin, bm.latmax, 50), 3))
+# labels = [item.get_text() for item in ax.get_yticklabels()]
+# ylabels = np.arange(0, shape[0] * fs, shape[0] * fs / len(labels)).astype(int)
+# ax.set_yticklabels(ylabels-2600, fontsize=11)
+ax.set_xlabel("West-East (m)", fontsize=12)
+ax.set_ylabel("South-North (m)", fontsize=12)
+ax.grid(True, linestyle="--", lw=0.2, zorder=1)
+
+ax.set_title(f"Pelican Mountain", fontsize=16)
+ax.set_xlim(-113.58093195, -113.56039335)
+ax.set_ylim(55.70318713, 55.72648132)
 
 fig.tight_layout()
+ax.ticklabel_format(useOffset=False)
+# plt.savefig(str(save_dir) + f"/site-map-close.png", dpi=250, bbox_inches="tight")
 
-plt.savefig(str(save_dir) + f"/site-map.png", dpi=250, bbox_inches="tight")
 
-
-# contour = ax_map.contourf(
-#     XLONG, XLAT, FUELS['fuel'], zorder=1, cmap = 'Greens_r'
+# fig = plt.figure(figsize=(8, 6))
+# ax = fig.add_subplot(1, 1, 1)
+# bm = Basemap(
+#     llcrnrlon=XLONG[0, 0]+0.0014,
+#     # llcrnrlon=XLONG[0, 0],
+#     llcrnrlat=XLAT[0, 0],
+#     urcrnrlon=XLONG[-1, -1],
+#     urcrnrlat=XLAT[-1, -1]+0.001,
+#     # urcrnrlat=XLAT[-1, -1],
+#     epsg=4326,
+#     ax=ax,
 # )
+# wesn = [XLONG[0, 0], XLONG[-1, -1],XLAT[0, 0], XLAT[-1, -1]]
+# # ax = fig.add_subplot(1,1,1, projection=ccrs.UTM(zone=12))
+# factor=3.5/255
+# clip_range=(0,1)
+# real = np.clip(plt.imread(filein) * factor, *clip_range)
+# real = real[::-1,:,:]
+# bm.imshow(real, zorder = 1, extent =wesn)
+
+# polygons = bm.readshapefile(fireshape_path, name="units", drawbounds=True, zorder=10)
+# shape = XLAT.shape
+# ax.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 32))
+# labels = [item.get_text() for item in ax.get_xticklabels()]
+# xlabels = np.arange(0, shape[1] * fs, shape[1] * fs / len(labels)).astype(int)
+# ax.set_xticklabels(xlabels-1000, fontsize=11)
+
+# ax.set_yticks(np.linspace(bm.latmin, bm.latmax, 50))
+# labels = [item.get_text() for item in ax.get_yticklabels()]
+# ylabels = np.arange(0, shape[0] * fs, shape[0] * fs / len(labels)).astype(int)
+# ax.set_yticklabels(ylabels-2600, fontsize=11)
+# ax.set_xlabel("West-East (m)", fontsize=12)
+# ax.set_ylabel("South-North (m)", fontsize=12)
+# ax.grid(True, linestyle="--", lw=0.2, zorder=1)
+
+
+# for h in hfxs:
+#     if h == list(hfxs)[-1]:
+#         ax.scatter(
+#             hfxs[h]["lon"],
+#             hfxs[h]["lat"],
+#             zorder=9,
+#             s=30,
+#             color="tab:orange",
+#             marker=".",
+#             label="Heatflux",
+#         )
+#     else:
+#         ax.scatter(
+#             hfxs[h]["lon"],
+#             hfxs[h]["lat"],
+#             zorder=9,
+#             s=30,
+#             color="tab:orange",
+#             marker=".",
+#         )
+
+# for r in ros:
+#     if r == list(ros)[-1]:
+#         ax.scatter(
+#             ros[r]["lon"],
+#             ros[r]["lat"],
+#             zorder=9,
+#             s=10,
+#             color="tab:green",
+#             marker=".",
+#             label="Thermocouples",
+#         )
+#     else:
+#         ax.scatter(
+#             ros[r]["lon"],
+#             ros[r]["lat"],
+#             zorder=9,
+#             s=10,
+#             color="tab:green",
+#             marker=".",
+#         )
+
+# for aq in aqs:
+#     if aq == list(aqs)[-1]:
+#         ax.scatter(
+#             aqs[aq]["lon"],
+#             aqs[aq]["lat"],
+#             zorder=10,
+#             # label=aq_ids[i],
+#             color="tab:red",
+#             edgecolors="black",
+#             marker="^",
+#             s=100,
+#             label="Air Quality Monitor",
+#         )
+#     else:
+#         ax.scatter(
+#             aqs[aq]["lon"],
+#             aqs[aq]["lat"],
+#             zorder=10,
+#             # label=aq_ids[i],
+#             color="tab:red",
+#             edgecolors="black",
+#             marker="^",
+#             s=100,
+#         )
+
+
+# ax.scatter(
+#     mets["south_met"]["lon"],
+#     mets["south_met"]["lat"],
+#     zorder=10,
+#     edgecolors="black",
+#     color="tab:blue",
+#     marker="D",
+#     s=80,
+#     label="Met Tower",
+# )
+# legend = ax.legend(
+#     loc="upper right",
+#     ncol=1,
+#     fancybox=True,
+#     shadow=True,
+# )
+# ax.set_title(f"Pelican Mountain Unit 5 Sensor Location", fontsize=16)
+
+# ax.set_xlim(-113.58493195, -113.56339335)
+# ax.set_ylim(55.71618713, 55.72648132)
+
+# fig.tight_layout()
+# # ax.ticklabel_format(useOffset=False)
+# plt.savefig(str(save_dir) + f"/site-map-close.png", dpi=250, bbox_inches="tight")
+
+
+# %%

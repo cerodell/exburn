@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from pathlib import Path
-import matplotlib.pylab as pylab
 from netCDF4 import Dataset
+import matplotlib.pylab as pylab
 
 import dask
 from datetime import datetime
@@ -17,23 +17,48 @@ import pyproj as pyproj
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from context import root_dir, data_dir, save_dir
+from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pylab as pylab
+import matplotlib.colors as colors
+from utils.sfire import makeLL
 
 
-pm_ef = 21.05  # boreal wildfire emission factor Urbanski (2014)
-modelrun = "F6V81"  #'F6V41' 'F6V81'
-# if modelrun ==
-ds = 25
-# var = "tr17_1"
-# title = "Tracer"
-# units = "Concentration g kg^-1"
-# cmap = "cubehelix_r"
-# levels = np.arange(0, 10000, 10)
+##################### Define Inputs and File Directories ###################
+modelrun = "F6V51M08Z22"
+configid = "F6V51"
+domain = "met"
+fireshape_path = str(data_dir) + "/unit_5/unit_5"
+aqsin = str(data_dir) + "/obs/aq/"
+aqsin = sorted(Path(aqsin).glob(f"*"))
+save_dir = Path(str(save_dir) + f"/{modelrun}/")
+save_dir.mkdir(parents=True, exist_ok=True)
 
-var = "temp"
-title = "Temperature"
-units = "K"
-cmap = "jet"
+var = "wsp"
+title = "Wind Speed 10m"
+units = "m s^-1"
+levels = np.arange(0, 10.0, 0.1)
+colors = [
+    "#FFFFFF",
+    "#BBBBBB",
+    "#646464",
+    "#1563D3",
+    "#2883F1",
+    "#50A5F5",
+    "#97D3FB",
+    "#0CA10D",
+    "#37D33C",
+    "#97F58D",
+    "#B5FBAB",
+    "#FFE978",
+    "#FFC03D",
+    "#FFA100",
+    "#FF3300",
+    "#C10000",
+    "#960007",
+    "#643C32",
+]
+cmap = LinearSegmentedColormap.from_list("meteoblue", colors, N=len(levels))
+
 
 fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
 save_dir = Path(str(save_dir) + f"/{modelrun}/")
@@ -44,7 +69,7 @@ save_dir.mkdir(parents=True, exist_ok=True)
 ncfile = Dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
 # var_ds = wrf.getvar(ncfile, 'theta_e', wrf.ALL_TIMES)
 height = wrf.getvar(ncfile, "height")
-height = np.round(height.values[:, 0, 0]).astype(int)
+height = np.round(height.values[:, 0, 0])
 
 temp = wrf.getvar(ncfile, "temp", wrf.ALL_TIMES)
 var_ds = temp.to_dataset()
@@ -54,7 +79,7 @@ levels = np.arange(float(temp.min()), float(temp.max()), 1)
 
 # interp_level = var_ds.interp_level * 1000
 interp_level = height
-south_north = var_ds.south_north * ds
+south_north = var_ds.south_north * 25
 var_ds = var_ds.isel(west_east=71)
 var_ds = var_ds.isel(Time=slice(0, 200))
 # var_ds = var_ds.sum(dim = 'west_east')

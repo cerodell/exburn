@@ -51,10 +51,19 @@ bottom_top = slice(0, 22, None)
 
 ## open wrf model output as xarray
 wrf_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
+## open wind speed and direcation nc file and slice
+wsp_dir_ds = xr.open_dataset(str(data_dir) + f"/{modelrun}/wspd_wdir.nc")
+wsp_dir_ds = wsp_dir_ds.isel(
+    west_east=74, south_north=south_north, bottom_top=bottom_top, Time=slice(0, 100)
+)
 ## use wrf python to get model heights
 ncfile = Dataset(str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11")
 height = wrf.getvar(ncfile, "height")
 height = height.isel(south_north=132, west_east=74, bottom_top=bottom_top)
+
+## separate wind speed and direction in U and W winds
+U = wsp_dir_ds.ua
+W = wsp_dir_ds.wa
 
 ## get heatflux for plotting
 hfx = wrf_ds["GRNQFX"]
@@ -84,6 +93,9 @@ fig = plt.figure(figsize=(14, 3))
 ax = fig.add_subplot(1, 1, 1)
 ## get first time index and plot
 ds = var_da.isel(Time=0)
+Ui = U.isel(Time=0).values
+Wi = W.isel(Time=0).values
+
 ax.set_title(f"{title} \n" + ds.XTIME.values.astype(str)[:-10], fontsize=18)
 contour = ax.contourf(
     sn,
@@ -99,7 +111,22 @@ ax.set_ylabel("Vertical (m)", fontsize=14, labelpad=10)
 ax.set_xlabel("Horizontal (m)", fontsize=14, labelpad=10)
 ax.tick_params(axis="both", which="major", labelsize=12)
 colors_list = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+y = np.array([130, 128, 132, 167, 144]) - 110
+y = y * 25
+colors_list = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 ax.scatter(y[2], 32, color=colors_list[2], edgecolor="k", s=200, zorder=10)
+skip = 3
+wind = ax.quiver(
+    sn[::skip],
+    height[::skip],
+    Ui[::skip, ::skip],
+    Wi[::skip, ::skip],
+    scale_units="width",
+    zorder=10,
+    scale=100,
+    width=0.002,
+)
+
 
 hfx_i = hfx.isel(Time=0)
 ax_hx = ax.twinx()
@@ -133,6 +160,8 @@ def update_plot(i):
         c.remove()
     print(i)
     ds = var_da.isel(Time=i)
+    Ui = U.isel(Time=i).values
+    Wi = W.isel(Time=i).values
     # ax.set_title(f"{title} \n" + ds.Time.values.astype(str)[:-10], fontsize=18)
     ax.set_title(f"{title} \n" + ds.XTIME.values.astype(str)[:-10], fontsize=18)
     contour = ax.contourf(
@@ -144,6 +173,9 @@ def update_plot(i):
         levels=levels,
         extend="both",
     )
+
+    wind.set_UVC(Ui[::skip, ::skip], Wi[::skip, ::skip])
+
     hfx_i = hfx.isel(Time=i)
     ax_hx.plot(sn, hfx_i / 1000, color="tab:red", lw=0.8, zorder=10)
     ax_hx.set_ylabel(
@@ -165,5 +197,5 @@ fig.tight_layout()
 ## animate and store plot
 ani = animation.FuncAnimation(fig, update_plot, dimT, interval=3)
 ## save animation and close
-ani.save(str(save_dir) + f"/{var}-cross.mp4", writer="ffmpeg", fps=10, dpi=250)
+ani.save(str(save_dir) + f"/{var}-cross.mp4", writer="ffmpeg", fps=8, dpi=250)
 plt.close()

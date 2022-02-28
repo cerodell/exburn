@@ -59,10 +59,11 @@ $^{2}$ \quad Department of Atmospheric Sciences, University of Hawaii at Manoa, 
 
 
 % Abstract (Do not insert blank lines, i.e. \\)
-\abstract{Experimental burns are expensive and require a great deal of planning and coordination. Logistical challenges compounded with lousy weather can result in cancelation and loss of critical data collection. The experiment burns are also ``one and done'' events, requiring well-thought-out instrumentation placement to observe desired coupled wildfire-atmosphere characteristics. We explore whether forecast simulation of a coupled wildfire-atmosphere model at fine spatial, temporal resolution can inform quality instrumentation placement based on the predicted meteorologic conditions. We achieved this by employing an experimental burn in a black spruce forest as a case study. We affirmed that the model could reasonably predict the fire behavior, smoke emission, dispersion, and coupled feedbacks that transpired. This paper demonstrates how we configured the model and how we propose to use this configuration to collect vital observational data at future experimental burns.}
+\abstract{Experimental burns are expensive and require extensive planning and coordination. Logistical challenges compounded with unfavorable weather can lead to cancellations and loss of critical data collection. Moreover, experimental burns are "one and done" events, requiring careful instrument placement to observe desired coupled wildfire-atmosphere characteristics. This study examines the feasibility of using a coupled wildfire-atmosphere model at high spatiotemporal resolution to inform instrument placement for a small-scale experimental burn. We do so by using an experimental black spruce forest burn from May 11th, 2019, as a case study, we demonstrate that the model can reasonably predict fire behavior, smoke emissions, dispersion, and associated feedback.}
+
 
 % Keywords
-\keyword{experimental burn; fire modeling; observational data; WRF-SFIRE; pelican mountain; fire behavior; smoke emission and dispersion; coupled feedbacks}
+\keyword{experimental burn; fire modeling; observational data; WRF-SFIRE; pelican mountain; fire behavior; smoke emissions and dispersion; coupled feedbacks}
 
 % The fields PACS, MSC, and JEL may be left empty or commented out if not applicable
 %\PACS{J0101}
@@ -75,193 +76,189 @@ $^{2}$ \quad Department of Atmospheric Sciences, University of Hawaii at Manoa, 
 \section{Introduction}
 
 
-Collecting detailed observational data of wildfire activities is extremely difficult. As a result of highly dynamic behavior, the wildfire's size, shape, and direction(s) can change rapidly. The reasons for these behavioral changes are numerous in addition to the coupled fire-atmospheric processes, fuel type, moisture content, terrain, and even the mitigation measures employed by fire response teams all impact wildfire behavior. As a result of these and other factors, wildfire observational datasets are nearly nonexistent. Thus, the fire science community relies on experiential burns to collect critical data, which is then used to develop, improve and/or verify numerical wildfire-atmosphere models.
+Due to the highly dynamic nature of wildfires, observational studies of their behavior and effects on the atmosphere are often challenging. The wildfire's size, shape, and direction(s) can change rapidly in response to fuel type, moisture content, terrain and ambient weather. The behavior is further complicated by numerous fire-atmosphere feedback processes as well as potential mitigation measures employed by fire response teams. As a result, wildfire observational datasets are extremely scarce. Thus, the fire science community typically relies on experimental burns to collect critical data, which is then used to develop, improve and/or verify wildfire models \cite{mandel_coupled_2011,mandel_recent_2014,coen_requirements_2018}.
 
-Advancements in computational power and efficiency have enabled more physical processes to be implemented within numerical wildfire-atmosphere modeling \cite{kochanski_experimental_2018}. These models, still rely on underlining semi-empirical models and parametrization, each of which contains inherent errors. Over the years, data collected at serval experimental burns have improved the underlying parameters subsequently improving the accuracy of the numerical wildfire-atmosphere model(s) \cite{kochanski_experimental_2018,mallia_incorporating_2020,kochanski_evaluation_2013,coen_requirements_2018}.
+Advancements in computational power and efficiency have enabled more physical processes to be implemented within numerical wildfire-atmosphere modeling \cite{kochanski_experimental_2018}. These models, however, still rely on underlining semi-empirical parameterizations that often require many simplifying assumptions, which can lead to prediction errors. Experimental burn data collected in recent years \cite{butler_observations_2016,hudak_data_2014,hudak_data_2016,seto_csu_data_2016,seto_data_2016,hudak_data_2017,ottmar_data_2016,urbanski_data_2016} has been critical for estimating key parameters within these simplified parameterizations and for improving the overall accuracy of the numerical wildfire-atmosphere model(s). \cite{kochanski_experimental_2018,mallia_incorporating_2020,kochanski_evaluation_2013,coen_requirements_2018}.
 
-These experimental burns have also led to process enhancements such as better instrument placement \cite{kochanski_experimental_2018}, and the development of lower-cost (disposable) instrumentation. For process improvements to continue, more experimental burns, using novel experimental designs and conducted in varied forest ecosystems are required. These experiments will deepen our understanding of the complex coupled wildfire-atmospheric processes which in turn will improve our ability to mitigate the destruction caused by wildfires.
+These experimental burns have also led to process enhancements such as better instrument placement \cite{kochanski_experimental_2018}, and the development of lower-cost (expendable) instrumentation. For improvements to continue, more experimental burns, using novel experimental designs and conducted in varied forest ecosystems, are required \cite{mandel_recent_2014}. Such experiments may help improve our understanding of the complex coupled wildfire-atmospheric processes which in turn will improve our ability to mitigate the destruction caused by wildfires.
 
-The Pelican Mountain experimental fire research site in central Alberta, Canada was created to examine fire behavior in a boreal black spruce forest \cite{thompson_recent_2020}. The research site provides a unique opportunity for wildfire-atmosphere research and model development. Since well-observed experimental burns in black spruce forests are uncommon, the ability to monitor the behavior of this fuel type provides an opportunity to improve our understanding and modeling of wildfires in this forest ecosystem. An additional benefit of the site is its size and layout. It consists of 22 individual blocks that will provide researchers the opportunity to conduct experimental burns over the next several years. Since the fuel characteristics of a block can be modified (i.e., by thinning underbrush) a variety of situations can be studied more easily. Most importantly, studying the results of a burn within a particular block allows researchers to continually address lessons learned, and apply them moving forward.
+The Pelican Mountain experimental fire research site in central Alberta, Canada, was designed to examine fire behavior in a boreal black spruce forest \cite{thompson_recent_2020}. The research site allows for comparative experiments. The lot consists of 22 individual blocks that provide researchers the opportunity to conduct experimental burns over several years. Since the fuel characteristics of a block can be modified (e.g., by thinning underbrush) a variety of situations can be studied and compared. Most importantly, careful examination of data collected from a burn of a particular block allows researchers to adjust and improve their methods for subsequent experiments.
 
-Even considering the advantages Pelican Mountain provides, experimental burns are expensive and require very site-specific weather conditions. The natural question becomes can modeled simulations improve the design and layout of the instrumentation used in the experimental burn, thereby reducing costs?
-
-In this paper, we will investigate this question by using the 2019 Pelican Mountain Unit 5 burn as a case study to:(1) verify the forecast accuracy of the WRF-SFIRE model; (2) review learned lessons on the model configuration and the observed data; and (3) discuss the potential use of model forecasts to optimize instrumentation placement at the future burns.
+While the multi-lot design of Pelican Mountain site is helpful for experimental burn planning, individual blocks still require very site-specific weather conditions to carry out an experiment. This uncertainty can often be costly. Hence, the main goal of this paper is to examine whether numerical simulations can be used to inform the design and layout of the experiment, thereby reducing costs. We use the 2019 Pelican Mountain Unit 5 burn as a case study to:(1) verify the forecast accuracy of the WRF-SFIRE model; and (2) discuss the potential use of model forecasts to optimize instrumentation placement at the future burns.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Methods}
-\subsection{Observational Data}
+\subsection{Experimental Burn Design}
 
-The Unit 5 burn was conducted in the late afternoon on May 11, 2019, and consumed a 3.6 ha block of black spruce forest peatland. Researchers from diverse scientific backgrounds collected data on fuel moisture, fuel loading, fire behavior, smoke emission, smoke dispersion, and meteorology. The data collected was evaluated against the results of the WRF-SFIRE model simulations which is a coupled wildfire-atmosphere model that combines the Weather Research Forecast Model (WRF), with the Rothermel semi-empirical fire-spread algorithm \cite{mandel_coupled_2011,mandel_recent_2014}.
+The Unit 5 burn was conducted in the late afternoon on May 11th, 2019, and consumed a 3.6 ha block of black spruce forest peatland. Researchers from diverse scientific backgrounds collected data on fuel moisture, fuel loading, fire behavior, smoke emission, smoke dispersion, and meteorology. The data collected was used to evaluate WRF-SFIRE model simulations, where WRF-SFIRE is a coupled wildfire-atmosphere model that combines the Weather Research Forecast Model (WRF), with the Rothermel semi-empirical fire-spread algorithm \cite{mandel_coupled_2011,mandel_recent_2014}.
 
-Observational data of fire behavior were captured by 29 K-type thermocouples and five radiometers. Instruments were placed approximately 30 cm above the surface and placed in roughly a 20x20 meter array within the burn block. Sampling time was once a second (Figure~\ref{fig1}). Fire behavior was also monitored by ten in-fire video cameras, Aerial footage captured visible and infrared spectrums. The timing and location of ignition were captured by a GPS logger attached to a large drip-torched tethered underneath a helicopter.
+Fire spread and intensity were measured using 29 K-type thermocouples and 5 radiometers. Instruments were placed approximately 30 cm above the surface in roughly a 20x20 meter array within the burn block. Sampling time was once a second (Figure~\ref{fig1}). Fire behavior was also monitored by 10 in-fire video cameras as well as via visible and infrared aerial footage. The timing and location of ignition were tracked with a GPS logger attached to a large drip-torched tethered underneath a helicopter.
 
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=12.5 cm]{img/site-map}
- \caption{Site Map showing instrumentation placement during the Unit 5 experimental burn on May 11, 2019 at the Pelican Mountain research site in central Alberta, Canada. \label{fig1}}
+ \caption{Site map showing instrument placement during the Unit 5 experimental burn on May 11, 2019 at the Pelican Mountain research site in central Alberta, Canada. TODO add lat/lon origin \label{fig1}}
  \end{figure}
 
 
-Emissions and dispersions data were measured using five micro air quality sensors scattered downwind of the burn at distances ranging from 300-1000 m (Figure~\ref{fig1}). Meteorologic data was captured by an ATMOS-41 2D sonic anemometer, measuring every 10 seconds at 6.15 m above ground level (just above tree canopy height) and 40 m south of the ignition line. A detailed description of the research site, the Unit 5 experimental burn, and data collected can be found in \cite{thompson_recent_2020,thompson_data_2020,huda_study_2020}.
+Emissions and dispersion data were measured using five micro air quality sensors place downwind of the burn at distances ranging from 300-1000 m (Figure~\ref{fig1}). Meteorological data was captured by an ATMOS-41 2D sonic anemometer, measuring every 10 seconds at 6.15 m above ground level (just above tree canopy height) located 40 m south of the ignition line. A detailed description of the research site, the Unit 5 experimental burn, and data collected can be found in \cite{thompson_recent_2020,thompson_data_2020,huda_study_2020}.
 
 \subsection{Model Overview}
 
-The atmosphere and fire models that make up the WRF-SFIRE operate on two distinct spatial gridded meshes within the same geographic model domain. The 3-D atmosphere grid used in this study was configured in Large Eddy Simulation (LES) mode, which simulates turbulent flows by numerically solving the Navier–Stokes equations \cite{mandel_coupled_2011,mandel_recent_2014}. On the refined fire mesh, the Rothermel semi-empirical fire spread model tracks surface-fire propagation using the level set method based on the fuels, terrain, and interpolated wind speeds and direction from the atmospheric grid \cite{mandel_coupled_2011,mandel_recent_2014,munozesparza_accurate_2018}. The type and amount of fuel consumed releases heat and moisture fluxes into the atmosphere gird, altering the fluid dynamic. This process plays out for each computational time step of the simulation and creates the wildfire and atmosphere coupling.
+The atmosphere and fire models that make up the WRF-SFIRE operate on two distinct spatial gridded meshes within the same geographic model domain. The 3-D atmospheric grid used in this study was configured in Large Eddy Simulation (LES) mode, which simulates turbulent flows by numerically solving the Navier–Stokes equations \cite{mandel_coupled_2011,mandel_recent_2014}. On the refined fire mesh, the Rothermel semi-empirical fire spread model tracks surface-fire propagation using the level-set method based on the fuels, terrain, and interpolated wind speeds and directions from the atmospheric grid \cite{mandel_coupled_2011,mandel_recent_2014,munozesparza_accurate_2018}. The type, amount and moisture of fuel consumed determine sensible and latent heat flux forcing back into the atmospheric grid, altering the atmospheric motion. This process is repeated at each computational time step of the simulation, thereby allowing coupling between the fire and the atmosphere.
 
-The model domain was established at 4 km x 10 km with 25 m horizontal grid spacing for the atmosphere and 5 m horizontal refined fire mesh. The 5 m fire grid resolution was chosen to be finer than the planned 20x20 m array of thermocouples within the burn block. Model top was set at 4000 m divided into 51 hyperbolically stretched vertical levels. The lowest five model levels were 4 m, 12 m, 20 m, 29 m, and 40 m. The lowest model level (4 m) was chosen since it is the closest to the mid-flame height defined by Anderson Fuel Category 6. This category was chosen since it represents a black spruce forest, which is the dominant vegetation type at the Pelican Mountain research site \cite{anderson_aids_1982}.
+The model was configured with a 4 km x 10 km domain with 25 m and 5m horizontal grid spacing for the atmospheric and fire meshes, respectively. The 5 m fire grid resolution was intentionally chosen to be finer than the planned 20x20 m array of thermocouples within the burn block. We used 51 hyperbolically stretched vertical levels with a 4000 m model top. The lowest five model levels were 4 m, 12 m, 20 m, 29 m, and 40 m. The lowest model level (4 m) roughly matches the mid-flame height defined by Anderson Fuel Category 6, which most closely represents black spruce forest and is the dominant vegetation type at the Pelican Mountain research site \cite{anderson_aids_1982}.
 
-The initial inputs include; a sounding taken from an operation numerical weather predation model (WRF) an hour prior to ignition, a perturbed surface skin temperature (of 290 K) to start of convection, and a surface fuels map of Anderson’s Fuel Category 6 with a 10 meter no fuels buffer around each unit at the research site. A one-hour spin-up period was used to develop a well-mixed planetary boundary layer (PBL) prior to the first ignition at 17:49:48 MDT. Refer to Table~\ref{tab1} for basic configuration options and supplementary material for full model setup.
+The initial inputs include; a sounding taken from an operational numerical weather prediction model (WRF) an hour prior to ignition, a perturbed surface skin temperature (of 290 K) to start of convection, and a surface fuels map of Anderson’s Fuel Category 6 with a 10 meter no fuels buffer around each unit at the research site. A one-hour spin-up period was used to develop turbulence within a well-mixed planetary boundary layer (PBL) prior to the first ignition at 17:49:48 MDT. Refer to Table~\ref{tab1} for basic configuration options and supplementary material for full model setup.
 
 \begin{specialtable}[H]
-  \centering
-  \caption{Basic Model Configuration\label{tab1}}
-  \begin{tabular}{ll}
-  \toprule
-  \textbf{Parameter}	& \textbf{Description}\\
-  \midrule
-   Model		& \href{https://github.com/openwfm/WRF-SFIRE/tree/a2c3118f08ce424885705e9155b127ea28879f8b}{WRF-SFIRE V4.2}\\
-   Domain		& 160 grids (west-east) X 400 grids (south-north)\\
-   Horizontal grid spacing		& 25 m\\
-   Time Step	& 0.1 s\\
-   Model Top		& 4000 m\\
-   Vertical Levels		& 51\\
-   Lateral boundary conditions	& periodic\\
-   stretch hyp & True\\
-   z grd scale & 2.2\\
-  \bottomrule
-  \end{tabular}
-  \end{specialtable}
+\centering
+\caption{Basic Model Configuration\label{tab1}}
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter}	& \textbf{Description}\\
+\midrule
+ Model		& \href{https://github.com/openwfm/WRF-SFIRE/tree/a2c3118f08ce424885705e9155b127ea28879f8b}{WRF-SFIRE V4.2}\\
+ Domain		& 160 grids (west-east) X 400 grids (south-north)\\
+ Horizontal grid spacing		& 25 m\\
+ Time Step	& 0.1 s\\
+ Model Top		& 4000 m\\
+ Vertical Levels		& 51\\
+ Lateral boundary conditions	& periodic\\
+ stretch hyp & True\\
+ z grd scale & 2.2\\
+\bottomrule
+\end{tabular}
+\end{specialtable}
 
-After spin-up, a single ignition line was created. The ignition line started on the southeast corner of Unit 5 at 17:49:48 MDT and was completed 260 meters away on the southwest corner 120 seconds later. The locations and timing utilized were an estimated planned aerial ignition pattern.
+Following spin-up, the simulated fire was initialized using a single 260 meter ignition line, starting on the southeast corner of Unit 5 at 17:49:48 MDT and ending on the southwest corner 120 seconds later. The locations and timing utilized were an estimated planned aerial ignition pattern.
 
-The simulation continued for 40 minutes past ignition, capturing the roughly 10-minute period of peak burning and spread. Smoldering did occur after this 10-minute period but was not addressed in this study. Fuel mass loading was set to 1.3 $\mathrm{~kg}\mathrm{~m}^{-2}$ and dead fuel moister was set to 8$\%$ based on the previous day’s observations.
+The simulation continued for 40 minutes after ignition. Active burn and spread period was approximately 10-minute long. Smoldering did occur after this 10-minute period but was not explicitly modelled by WRF-SFIRE. Fuel mass loading was set to 1.3 $\mathrm{~kg}\mathrm{~m}^{-2}$ and dead fuel moister was set to 8$\%$ based on the previous day’s observations.
 
-Lastly, a passive tracer was used to represent smoke emission. The emissions were proportioned to the mass and type of fuel burned and later adjusted with fuel type-dependent emissions factors to represent particulate matter (PM) 2.5 concentration.
+A passive tracer was used to represent smoke emission. The emission rates were proportional to the mass and type of fuel burned and were later adjusted with fuel type-dependent emissions factors to represent particulate matter (PM) 2.5 concentration.
 
-Neither the chemistry nor fuel moisture models were activated within this WRF-SFIRE configuration. This will be explored in future studies.
+Neither the chemistry nor fuel moisture models were activated within this exploratory WRF-SFIRE study.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
 
-Generally speaking, the WRF-SFIRE simulations of the experimental burn yielded promising results, particularly when comparing: fire behavior, smoke emission, dispersion, and coupled feedbacks. Of the four parameters, fire behavior was the least successful. There were significant inaccuracies in arrival time in some sections on the burn block. The model’s smoke emission and dispersion peak occurrence predictions matched the observational data, although the magnitude did not compare favorably.
+The WRF-SFIRE simulations of the experimental burn yielded promising results, particularly when comparing: fire behavior, smoke emission, dispersion, and coupled feedbacks. Of the four parameters, fire behavior was the least successful. There were significant inaccuracies in arrival time in some sections on the burn block. The model’s smoke emission and dispersion peak occurrence predictions matched the observational data, although the magnitude did not compare favorably.
 Coupling feedbacks were evident between the fire and atmosphere with a shift in wind direction and distinctive gusts occurring in both the model and the observed data.
 
 A more quantitative analysis of each component is provided in the following sections.
 
 \subsection{Fire Behavior}
 
-For fire behavior, we compared the modeled heat flux at the nearest model grid cell to one of the corresponding 29 in-fire thermocouples. We normalized each variable and plotted a timeseries to capture the arrival time of both the observed and modeled fire front. Figure~\ref{fig2}A depicts the location of the 29 thermocouples sensors within the burn block. As presented in the figure, the sensors are in distinctive columns (arranged East-West) labeled on the South end of the unit as C2, C3, C4, C5, C6, C7, C8, and C9. Each column is then colored in the North-South direction. Spatially modeled arrival time is color contoured as seconds from ignition where the ignition line is shown as a dashed black line with the ignition start represented by a star and ignition stop as letter X.
+To assess the modeled fire behavior, we compared the observed temperature values from the 29 in-fire thermocouples (Figure~\ref{fig2}(A)) to the simulated heat flux at the nearest model grid cell. The arrival time for both observed and modeled fire fronts is shown in the normalized timeseries in Figure~\ref{fig2}(B).
+The sensors were arranged in distinctive columns (East to West) labeled on the South end of the unit as C2, C3, C4, C5, C6, C7, C8, and C9. Each column is then colored in the North-South direction. Spatially modeled arrival time is color contoured as seconds from ignition where the ignition line is shown as a dashed black line with the ignition start represented by a star and ignition stop as letter X.
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=13.6 cm]{img/ros-timeseries-single-line}
- \caption{(\textbf{A}) Shows model fireline arrival time from seconds past ignition, location of in-fire thermocouples and ignition line with start and stop shown as Star and X respectively. (\textbf{B}) hows timeseries of normalized modeled heat flux (solid lines) and normalized observed temperature (dashed lines). Start and stop of ignition symbols are the same as shown in (\textbf{A}). \label{fig2}}
+ \caption{(\textbf{A}) Contours of fire arrival time in seconds past ignition, location of in-fire thermocouples and ignition line with start and end. (\textbf{B}) Timeseries of normalized modeled heat flux (solid lines) and normalized observed temperature (dashed lines). Start and end of ignition symbols are the same as shown in (\textbf{A}). \label{fig2}}
  \end{figure}
 
-Figure~\ref{fig2}B shows time series subplots of each column with a matching color sequence to the map in Figure~\ref{fig2}A. On all-time series plots, normalized observed temperatures are represented as a dashed line, and normalized modeled heat flux is shown as sold lines. Also shown are the start-stop times of the ignition line.
+Figure~\ref{fig2}B shows timeseries subplots of each column with a matching color sequence to the map in Figure~\ref{fig2}A. On all timeseries plots, normalized observed temperatures are represented as a dashed line, and normalized modeled heat flux is shown as sold lines. Also shown are the start-stop times of the ignition line.
 
-Comparing the data, we find that the peak occurrence is off by an average of 13.6 secs for sensors in columns C3, C4, C6, and C7. This represents an error of 2.7$\%$ when considering the full duration of the burn. In columns C5 and C8, the model’s peak occurrence timing was much too early when compared to the observed data. This was due to the actual ignition line pattern. The planned aerial ignition pattern was to occur over a 120 second period and intended to be on a 260 m straight-line, terminating at the southwest corner of the block. Unfortunately, the actual ignition pattern and timing did not occur as planned.
+We found that on average for columns C3, C4, C6 and C7 the modeled peak heat occurred 13.6 sec later than observed. This represents an error of 2.7$\%$ when considering the full duration of the burn. For columns C5 and C8, the modeled peak was early, compared to the observed. This was due to the actual ignition line pattern. The planned aerial ignition pattern was to occur over a 120 second period and intended to be on a 260 m straight-line, terminating at the southwest corner of the block. Unfortunately, the actual ignition pattern and timing did not occur as planned, due to difficulties with the helicopter-borne driptorch.
 
-Instead of being a single line, four distinct ignition lines were created. The first ignition started on the southeast corner of Unit 5 at 17:49:48 MDT. The fourth and final ignition was completed on the southwest corner 163 seconds later with an un-ignited section between each of the four lines. To address these deviations, we re-ran the simulation using the actual locations and times. This data was obtained from the GPS data logger, which was attached to the ignition source, and was cross-verified by aerial videography.
+Instead of being a single line, four distinct ignition segments were created. The first segment started on the southeast corner of Unit 5 at 17:49:48 MDT. The fourth and final segment ended on the southwest corner 163 seconds later. Small un-ignited sections between each segment matched the locations and times observed from aerial footage and the GPS data logger attached to the helicopter.
 
-Re-running the simulation using the actual ignition patterns yielded much higher accuracy in columns C5 and C8 as well, as in columns C3, C4, C6, and C7 (Figure~\ref{fig3}). Columns C9 and C2 were poorly captured due to odd behaviors of the level set method at the fuel / no fuel boundaries.
+This alternative ignition configurations yielded improved accuracy for columns C5 and C8 as well as in columns C3, C4, C6, and C7 (Figure~\ref{fig3}). Columns C9 and C2 were poorly captured due to odd behavior of the level-set method at the fuel / no fuel boundaries in the model.
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=13.6 cm]{img/ros-timeseries-multi-line}
- \caption{Same information as Figure~\ref{fig2} with a modified four-line ignition pattern. This pattern more accurately represents what occurred in during the Unit 5 experimental burn.\label{fig3}}
+ \caption{Same information as Figure~\ref{fig2} with a modified four-line ignition pattern. .\label{fig3}}
  \end{figure}
 
 \subsection{Smoke Emissions and Dispersion}
 
-For smoke emission and dispersion, we compared PM 2.5 concentrations from the single line simulation to the observed concentration at five air quality monitors downwind of the burn. The five-air quality stations were deployed downwind in a near-field region coving an arc angle of 128 degrees \cite{huda_study_2020}. The model passive tracer concentrations were converted to PM2.5 concentration using the combustion phase emission factor for black spruce flues of 10.4 $\mathrm{~g}\mathrm{~kg}^{-2}$ \cite{prichard_wildland_2020}.
+We compared PM 2.5 concentrations from the single line simulation to the observed concentration at five air quality monitors downwind of the burn. The five-air quality stations were deployed downwind in a near-field region covering an arc angle of 128 degrees \cite{huda_study_2020}. The model passive tracer concentrations were converted to PM 2.5 concentration using the combustion phase emission factor for black spruce fuels of 10.4 $\mathrm{~g}\mathrm{~kg}^{-2}$ \cite{prichard_wildland_2020}.
 
 
-To conceptualize the dispersion, we vertically and horizontally (i.e., crosswind) integrated the PM 2.5 concentration at the timing of peak modeled values at air quality station 303-100 (Figure~\ref{fig4}A, \ref{fig4}B, and \ref{fig4}C). Peak concentrations of the modeled PM 2.5 occurred 40 seconds earlier than observed and at roughly half the order of magnitude at station 303-100 (Figure~\ref{fig4}C).
+Vertically and horizontally (i.e., crosswind) integrated PM 2.5 concentration at the time of peak heat for each air quality station 303-100 is shown in (Figure~\ref{fig4}A, \ref{fig4}B, and \ref{fig4}C). Maximum concentrations of the modeled PM 2.5 occurred 40 seconds earlier than observed and at roughly half the order of magnitude at station 303-100 (Figure~\ref{fig4}C).
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=13.4 cm]{img/smoke-aq-comparison-single-line}
- \caption{(\textbf{A}) Vertically integrated smoke at 18:00:21 (HH:MM:SS) and position of air quality sensors. (\textbf{B}) Crosswind integrated smoke at 18:00:21 (HH:MM:SS). (\textbf{C}) Time series of observed to nearest model grid cell. Peak emission occurred for station 303-001 at 18:00:21 (HH:MM:SS).\label{fig4}}
+ \caption{(\textbf{A})Horizontal map of vertically integrated smoke at 18:00:21 (HH:MM:SS) and position of air quality sensors. (\textbf{B}) Vertical cross-section of crosswind integrated smoke at 18:00:21 (HH:MM:SS). (\textbf{C}) Concentration timeseries of observed and modeled concentrations at the air quality sensors in (\textbf{A}). Peak emission occurred for station 303-001 at 18:00:21 (HH:MM:SS).\label{fig4}}
  \end{figure}
 
-The timing of peak concentration for both modeled and observed occurred after peak heat flux. In supplementary material, S1 is a model animation of a crosssection of smoke dispersion along the exact longitude as sensor 303-100 which, is represented as a green dot in Figure~\ref{fig4}C. We see from the video that after the extinction of the heat flux, the vertical motion of the plume column stops, and ambient horizontal winds force dispersion downwind. As expected, the magnitude difference is negligible since emission factors for black spruce have not been fully studied \cite{prichard_wildland_2020}.
+Maximum concentration for both modeled and observed PM 2.5 concentrations occurred after peak heat flux.
+Animation of a smoke cross-section at location of sensor (303-100; green dot in Figure~\ref{fig4}C) is provided as Supplementary Material S1. As seen in the animation, once the active burning stage is complete
+the vertical motion of the plume slows and transitions to dispersion by ambient horizontal flow. Note, that the magnitude difference is negligible since emission factors for black spruce have not been fully studied \cite{prichard_wildland_2020}.
 
-The results from the four-line ignition simulation were comparable to the single-line ignition simulation (Figure~\ref{fig5}). Sensor 303-300 was the only other instrument to detect smoke from the burn. This observed increase in smoke was caused by smoldering combustion, which is not addressed in the WRF-SFIRE model \cite{mallia_incorporating_2020,mandel_coupled_2011,mandel_recent_2014}.
+The results from the four-line ignition simulation were comparable to the single-line ignition simulation (Figure~\ref{fig5}). Sensor 303-300 was the only other instrument to detect smoke from the burn. This observed increase in smoke was caused by smoldering combustion, which is not addressed in the WRF-SFIRE model. \cite{mallia_incorporating_2020,mandel_coupled_2011,mandel_recent_2014}.
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=13.4 cm]{img/smoke-aq-comparison-multi-line}
- \caption{Same as Figure~\ref{fig4} with a modified four-line ignition pattern. This pattern more actually represents what occurred in during the Unit 5 experimental burn. Note timing of peak emission occurred for station 303-001 at 18:00:10 (HH:MM:SS) or 10 seconds earlier than the single line ignition pattern.\label{fig5}}
+ \caption{Same as Figure~\ref{fig4} with a modified four-line ignition pattern. Note timing of peak emission occurred for station 303-001 at 18:00:10 (HH:MM:SS) or 10 seconds earlier than the single line ignition pattern.\label{fig5}}
  \end{figure}
 
 
 \subsection{Coupled Feedback}
 
-To analyze the fire and atmospheric coupled feedbacks we first compared the measured in-fire heat flux values to the modeled heat flux values (Figure~\ref{fig6}). The peak heat at each of the fire sensors to the nearest model grid showed strong agreements of heat introduced to the atmosphere from the fire.
+To analyze the fire and atmospheric coupled feedbacks we first compared the measured in-fire heat flux values to the modeled heat flux values (Figure~\ref{fig6}). The peak heat at each of the fire sensors showed strong agreements of heat introduced to the atmosphere from the simulated fire at the nearest model grid.
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=10.5 cm]{img/hfx-comparison}
- \caption{Distribution of Max heat flux for observed to nearest model grid cell to the five in fire heat flux sensors.\label{fig6}}
+ \caption{Distribution of maximum values for observed vs modelled heat flux at the five in fire heat flux sensors.\label{fig6}}
  \end{figure}
 
-Next, we analyzed the fire thermodynamic effects on the atmosphere by comparing observed wind speed and direction to those of the model at 6.15 meters above ground level (AGL) from a tower 40 m south of the burn (Figure~\ref{fig7}A). Also, shown in Figure~\ref{fig7}A are color contoured wind speeds and directional streamlines at 6.15 m AGL during peak modeled wind gust at the nearest modeled grid to the met tower.
+Next, we analyzed the fire thermodynamic effects on the atmosphere by comparing modeled vs observed wind speed and direction at 6.15 meters above ground level (AGL) from a tower 40 m south of the burn (Figure~\ref{fig7}A). Also shown are color contoured wind speeds and directional streamlines at 6.15 m AGL during peak modeled wind gust at the nearest modeled grid to the met tower.
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=13.4 cm]{img/wsp_wdir-comparison}
- \caption{(\textbf{A}) Modeled Wind Speed and Direction) 6.15 m AGL at 17:54:51 (HH:MM:SS) and location met tower sampling at 6.15 m AGL. (\textbf{B}) Timeseries of Wind Speed and Direction at met tower showing in blue model (sold line) and observed (dashed line). Also shown is modeled max heat flux values as a red solid line. The vertical dashed line is at at 17:54:51 (HH:MM:SS)\label{fig7}}
+ \caption{(\textbf{A}) Modeled wind speed and direction at 6.15 m AGL at 17:54:51 (HH:MM:SS). The location of the met tower is also shown. (\textbf{B}) Timeseries of wind speed and direction at the met tower shown in solid and dashed blue for modelled and observed values, respectively. Also shown is modeled fire integrated heat flux (solid red). The vertical dashed line is at at 17:54:51 (HH:MM:SS)\label{fig7}}
  \end{figure}
 
-Figure~\ref{fig7}B shows a time series comparison of wind speed and direction during the burn period. We found that after ignition wind direction observed and molded showed less random variation maintaining southerly wind flow that helped propagate the east-west orientated fireline north. Also, after ignition, wind speeds exhibited an increasing trend that peaks roughly 30 seconds after maximum accumulated heat flux in the atmosphere. Figure~\ref{fig7}B shows the temporal relationship of the model, using the maximum modeled heat flux, and observed wind direction and speed.
+Figure~\ref{fig7}B shows a timeseries comparison of wind speed and direction during the burn period. After ignition, wind direction observed and molded showed less random variation maintaining southerly wind flow that helped propagate the east-west orientated fireline north. Also, after ignition, wind speeds exhibited an increasing trend that peaks roughly 30 seconds after maximum accumulated heat flux to the atmosphere. Figure~\ref{fig7}B shows the temporal relationship of the model, using the fire integrated modeled heat flux, and observed wind direction and speed.
 
 \section{Discussion}
 
-Our objective was to determine the WRF-SFIRE model’s ability to forecast an experimental burn using the 2019 Unit 5 burn at Pelican Mountains as the comparison event. We initialized WRF-SFIRE, configured in LES mode, with a numerical weather prediction model. The following sections discuss how we determined the model’s configuration and what we’d like to do differently at future experimental burns.
+Our objective was to determine the WRF-SFIRE model’s ability to forecast fire and smoke dispersion conditions at 2019 Unit 5 experimental burn at Pelican Mountain. The following sections discuss model configuration, it's accuracy and implications for future experimental planning.
 
 \subsection{Observation Dataset}
 
-Data collected at experimental burns has led to the creation of new model parameters and improved model accuracy \cite{kochanski_experimental_2018,mallia_incorporating_2020,moisseeva_capturing_2019,kochanski_evaluation_2013,coen_requirements_2018}. We believe that these efforts should continue and propose new experimental designs based on our Unit 5 cases study and field experience.
-
-Improving the ability to observe actual fire behavior is critical. Two of the most important parameters to more fully observe and understand are heat flux and temperature. Expanding observations vertically to include multiple levels with detailed fuel moister sampling will allow us better to assess heat and moisture flux in the atmosphere. This is particularly important since these two parameters directly impact smoke emissions, smoke dispersion, and coupled feedbacks.
+Our ability to observe and quantify fire behavior is critical for model development and hazard mitigation. In particular, our understanding of vertical heat and moisture transfer from the fire into the atmosphere remains limited. Moreover, the associated feedback mechanisms introduce an additional layer of complexity to our modeling efforts.
 
 To gain a better understanding of the coupled feedback(s) we propose building expendable cup anemometers and wind vanes. We have been developing these sensors and plan to have them in use at an experimental burn in May 2022. These sensors will be placed above, below, and most importantly, directly at the projected mid-flame height. The data will be broadcast by long range radio frequencies to a nearby receiver. The data collected will establish the altered flow patterns at and around the fire front. Of particulate interest are the vertical-to-bent-over vortices on the ends of the fireline. These areas rapidly mix environmental air into the smoke plume, and directly impact modulation of fire intensity and fire updrafts \cite{moisseeva_capturing_2019,moisseeva_wildfire_2021,clements_fire_2016}.
 
-The current approach for observing smoke emissions and dispersion can be improved by simply utilizing the forecast simualtion of the conltred burn. This will allow better placement of air quality sensors so that a better arch angle can be established. Using more sensors, placed at better locations, will increase both the quantity and quality of the data collected. This enhanced data set will be valuable for improving emissions factors for black spruce forest ecosystems, thereby improving regional smoke forecast models \cite{prichard_wildland_2020}.
+The current approach for observing smoke emissions and dispersion can be improved by simply utilizing the forecast simulation of the controlled burn. This will allow better placement of air quality sensors so that a better arch angle can be established. Using more sensors placed at better locations will increase both the quantity and quality of the data collected. This enhanced data set will be valuable for improving emissions factors for black spruce forest ecosystems, thereby improving regional smoke forecast models \cite{prichard_wildland_2020}.
 
-To collect data on smoke emission and dispersion aloft, we are developing expendable air quality sensors that will vertically profile the smoke plume. The sensors will be treated as radiosondes or dropsonde to make in-situ observations of PM 1.0, 2.5, and 10 concentrations within the smoke plume. The sensor will be attached to a Windsond radiosonde instrument \cite{bessardon_evaluation_2019} that measures the vertical profile of temperature, dew point, wind speed, and direction. Coupling the two instruments will hopefully provide a much-needed dataset to aid in evaluating smoke plume rise modeling.
+To collect data on smoke emission and dispersion aloft, we are developing expendable air-quality sensors that will vertically profile the smoke plume. The sensors will be treated as radiosondes or dropsonde to make in-situ observations of PM 1.0, 2.5, and 10 concentrations within the smoke plume. The sensor will be attached to a Windsond radiosonde instrument \cite{bessardon_evaluation_2019} that measures the vertical profile of temperature, dew point, wind speed, and direction. Coupling the two instruments will hopefully provide a much-needed dataset to aid in evaluating smoke plume rise modeling.
 
-Sampling locations will be determined by the WRF-SFIRE forecast simulations. Our goal is to profile the smoke plume once its vertical motion has stabilized and is at a safe downwind distance so that the aircraft supporting the experiment are not threatened. Figure~\ref{fig8} shows a modeled profile of the atmosphere and smoke plume for what would have been our target launch location if the equipment was available at the May 2019 experimental burn.
+Sampling locations will be determined by the WRF-SFIRE forecast simulations. Our goal is to profile the smoke plume (once its vertical motion has stabilized) at a safe downwind distance so that the aircraft supporting the experiment are not threatened. Figure~\ref{fig8} shows a modeled profile of the atmosphere and smoke plume for what would have been our target launch location if the equipment was available at the May 2019 experimental burn.
 
 \begin{figure}[H]
 \centering
  \includegraphics[width=13.4 cm]{img/simulated-sounding}
- \caption{The preferred launch location for radiosonde or dropsonde with combined air quality sensor to make in-situ observations of the smoke plume. (\textbf{A}) Show the location of the proposed launch along with vertically integrated smoke at 18:00:31 (HH:MM:SS). (\textbf{B}) Crosswind integrated smoke plume at the same time as A with launch location marked as a dashed vertical line. Associated profile at launch location of (\textbf{C}) temperature, (\textbf{D}) Potential Temperature (\textbf{E}) PM2.5 Concentration Speed and Direction (\textbf{F}) Wind Speed and Direction. \label{fig8}}
+ \caption{The preferred launch location for radiosonde or dropsonde with combined air quality sensor to make in-situ observations of the smoke plume. (\textbf{A}) Map showing the location of the proposed launch along with vertically integrated smoke at 18:00:31 (HH:MM:SS). (\textbf{B}) Vertical cross-section of crosswind integrated smoke plume at the same time as \textbf{A} with launch location marked as a dashed vertical line. Associated profile at launch location of (\textbf{C}) temperature, (\textbf{D}) Potential Temperature (\textbf{E}) PM 2.5 Concentration Speed and Direction (\textbf{F}) Wind Speed and Direction. \label{fig8}}
  \end{figure}
 
-Another important data set to be collected are the vertical profiles of the atmosphere both before, at, and after ignition. Accurate sounding datasets are needed to initialize models during detailed verification research \cite{kochanski_experimental_2018,moisseeva_capturing_2019}. The Windsond radiosonde sensor mentioned previously will also be utilized for this purpose. The sensors have distinct advantages over more conventional equipment since their size, weight, and cost, all are much less making them very useful for deployment in remote locations.
+Additional data to be collected are the vertical profiles of the atmosphere both before, at, and after ignition. Accurate sounding datasets are needed to initialize models during detailed verification research \cite{kochanski_experimental_2018,moisseeva_capturing_2019}. The Windsond radiosonde sensor mentioned previously will also be utilized for this purpose. The sensors have distinct advantages over more conventional equipment since their reduced size, weight, and cost, make them very useful for deployment in remote locations.
 
 \subsection{Model Configuration}
 
-As mentioned in section 2.2, the lowest model level of 4 m was chosen since it is was the closest level to the mid-flame height, based upon Anderson’s fuel category 6. The model’s output compared well against the observed parameters (i.e., fire behavior, smoke emission, and dispersion, and coupled feedbacks) and most importantly captured fire behavior accurately since it is very sensitive to small variations in the lower vertical grid levels.
+As discussed in section 2.2, the lowest model level of 4 m was chosen based on the associated fuel (Anderson's category 6) mid-flame height. The model’s output compared well against the observed parameters (i.e., fire behavior, smoke emission, and dispersion, and coupled feedbacks) and most importantly captured fire behavior accurately. In developing our simulations we discovered that modeled fire behavior was particularly sensitive to this choice of near-surface vertical levels.
 
-We conducted a sensitivity analysis by adjusting the \texttt{z grd scale} values in the \texttt{namelist.input} and evaluated how hyperbolically stretched the vertical levels became. A range of \texttt{z grd scale} values 1.6, 1.8 2.0, 2.2, 2.4 were tested while leaving all other model inputs and configuration options constant.
+We conducted a sensitivity analysis by adjusting the hyperbolic vertical stretching factor. We tested the following values of \texttt{z grd scale} parameter while leaving all other configuration settings constant: 1.6, 1.8 2.0, 2.2, 2.4.
 
-Low \texttt{z grd scale} values resulted in relatively slow fire spread rates, lower emissions, and weakening coupled feedbacks. High, \texttt{z grd scale} values resulted in numerical instability and run failure due to violations of Courant–Friedrichs–Lewy (CFL) conditions. The vertical motion was too fast particularly in the low to mid levels which became more tightly packed due to excessive vertical stretching.
+Low \texttt{z grd scale} values resulted in relatively slow fire spread rates, lower emissions, and weakening coupled feedbacks. High \texttt{z grd scale} values generated numerical instability, resulting in violations of Courant–Friedrichs–Lewy (CFL) conditions and, hence, required reduced timesteps lengths and increased model run time. Such simulations have limited utility as forecast products. Based on the sensitivity study results, we determined the optimal configuration to be \texttt{z grd scale} of 2.2 using 51 levels with a model top of 4000 m that again places the lowest model level nearly equal to mid-flame height for the corresponding fuel type. Full details of the configuration can be found in supplementary materials.
 
-To overcome the CFL violation time step for integration was lowered which inevitability increased model run time As our objective was to run WRF-SFIRE as a forecast product this was not desirable and required further sensitivity testing of model resolution to model accuracy and run time. The resulting configuration can be found in supplementary martial.
+In the WRF-SFIRE model development manuscript, Mandel stresses that ``\textit{the fire model should use the wind speed taken from the level as close to the mid-flame height as possible. This requirement translates into a need for very high vertical resolution}'' \cite{mandel_coupled_2011}. This statement is incredibly important and something we want to reiterate
 
-
-In the WRF-SFIRE model development manuscript, Mandel stresses that ``\textit{the fire model should use the wind speed taken from the level as close to the mid-flame height as possible. This requirement translates into a need for very high vertical resolution}'' \cite{mandel_coupled_2011}. This statement is incredibly important and something we want to reiterate.
-
-Finally, we welcome the developers of WRF-SFIRE to implement crown fire modeling capabilities into the model. The majority of planned experimental burns at Pelican Mountain are intended crown fires. The Unit 5 burn was classified as a high-intensity crown fire, something we could not address in our modeling efforts. The dataset collected at Pelican Mountain could help with this implementation and verification.
+Finally, we encourage the developers of WRF-SFIRE to implement crown fire modeling capabilities into the model. The majority of planned experimental burns at Pelican Mountain are intended crown fires. The Unit 5 burn was classified as a high-intensity crown fire, something we could not address in our modeling efforts with WRF-SFIRE. The dataset collected at Pelican Mountain could help with this implementation and verification.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-Employing WRF-SFIRE, configured in LES mode, as a forecasting tool to predict fire behavior, smoke emissions, and dispersions of experimental burns is achievable. We tested this by initializing the WRF-SFIRE-LES simulation with numerical weather prediction model forecast outputs—verifying the simulation to data observed at the 2019 Unit 5 Pelican Mountain experimental burn in central Alberta, Canada.
+In this work we demonstrate the feasibility of using WRF-SFIRE as a forecasting and planning tool for experimental burns. We provide two case-study numerical simulations for the 2019 Unit 5 Pelican Mountain experimental burn in central Alberta, Canada. Our results show accuracy in the timing and location of fire behavior and smoke emissions and dispersion. The model's lowest vertical level needs to be at or below the mid-flame for the defined fuel type to achieve these results.
 
 We illustrated how our approach can be applied to further the knowledge gained at experimental burns and expand the critical dataset of the coupled fire-atmosphere interactions. By ensuring instruments are positioned to capture key parameters of interest, researchers can improve the quality of data collected and importantly lower the costs associated with working at remote experimental burn sites.
 
@@ -279,7 +276,7 @@ We illustrated how our approach can be applied to further the knowledge gained a
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \authorcontributions{Conceptualization, C.R., N.M. and R.S.; Formal analysis, C.R.; Writing---original draft preparation, C.R.; Writing---review and editing, N.M., and R.S.; Visualization, C.R.; Supervision, N.M., and R.S.; Funding acquisition, R.S. All authors have read and agreed to the published version of the manuscript.}
 
-\funding{BCHydro, NRCAN, BC Env, AB Env, NWT Fire ??}
+\funding{BCHydro, Natural Resources Canada, Government of British Columbia Ministry of Environment and Climate Change Strategy, Government of Alberta Environment and Sustainable Resource Development, Government of the Northwest Territories Environment and Natural Resources, Natural Sciences and Engineering Research Council of Canada}
 
 
 \dataavailability{In this section, please provide details regarding where data supporting reported results can be found, including links to publicly archived datasets analyzed or generated during the study. Please refer to suggested Data Availability Statements in section ``MDPI Research Data Policies'' at \url{https://www.mdpi.com/ethics}. You might choose to exclude this statement if the study did not report any data.}
@@ -304,7 +301,6 @@ SFIRE & Surface Fire\\
 LES & Large Eddy Simulation\\
 AGL & Above Ground Level\\
 PM & Particulate Matter\\
-LD & Linear dichroism
 \end{tabular}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

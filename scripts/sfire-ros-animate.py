@@ -29,19 +29,16 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 domain = "fire"
 unit = "unit5"
-modelrun = "F6V51M08Z22I04B10"
+modelrun = "F6V51M08Z22I04T"
 configid = "F6V51"
 title = "Time of Arrival"
 var = "FGRNHFX"
 ig_start = [55.7177497, -113.5713062]
 ig_end = [55.7177507, -113.5751922]
-levels = np.arange(0, 201, 1)
+levels = np.arange(1, 201, 1)
 cmap = "Reds"
-alpha = 0.8
-Cnorm = colors.Normalize(vmin=0, vmax=200)
-ros_filein = str(data_dir) + "/obs/ros/"
+alpha = 1
 fireshape_path = str(root_dir) + "/data/unit_5/unit_5"
-headers = ["day", "hour", "minute", "second", "temp"]
 save_dir = Path(str(save_dir) + f"/{modelrun}/")
 save_dir.mkdir(parents=True, exist_ok=True)
 
@@ -55,14 +52,15 @@ west_east_subgrid = slice(bounds["fire"]["we"][0], bounds["fire"]["we"][1])
 fs = bounds["namelist"]["dxy"] / bounds["namelist"]["fs"]
 
 wrf_ds = xr.open_dataset(
-    str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:48", chunks="auto"
+    str(data_dir) + f"/{modelrun}/wrfout_d01_2019-05-11_17:49:11", chunks="auto"
 )
 var_da = wrf_ds[var] / 1000
 var_da = var_da.sel(
     south_north_subgrid=south_north_subgrid,
     west_east_subgrid=west_east_subgrid,
-    Time=slice(0, 100),
+    Time=slice(0, 60),
 )
+var_davar_da = xr.where(var_da > 1.0, var_da, np.nan)
 times = var_da.XTIME.values
 
 XLAT, XLONG = makeLL(domain, configid)
@@ -92,11 +90,15 @@ ax.set_title(f"{title} \n" + da.XTIME.values.astype(str)[:-10], fontsize=18)
 contour = ax.contourf(
     XLONG, XLAT, da, zorder=2, cmap=cmap, levels=levels, extend="max", alpha=alpha
 )
-ax.set_xlabel("Longitude (degres)", fontsize=16)
-ax.set_ylabel("Latitude (degres)", fontsize=16)
+
+ax.set_xlabel("West-East", fontsize=16)
+ax.set_ylabel("South-North", fontsize=16)
 ax.tick_params(axis="both", which="major", labelsize=14)
 cbar = plt.colorbar(contour, ax=ax, pad=0.05)
 cbar.ax.tick_params(labelsize=12)
+cbar.set_label(
+    "Heat Flux \n" + r"$(\mathrm{~kW} \mathrm{~m}^{-2})$", fontsize=13, labelpad=15
+)
 
 
 def plotstuff(i):
@@ -140,7 +142,7 @@ def update_plot(i):
         zorder=2,
         cmap=cmap,
         levels=levels,
-        extend="both",
+        extend="max",
         alpha=alpha,
     )
     return contour
@@ -148,5 +150,5 @@ def update_plot(i):
 
 fig.tight_layout()
 ani = animation.FuncAnimation(fig, update_plot, dimT, interval=3)
-ani.save(str(save_dir) + f"/{var}-topview.mp4", writer="ffmpeg", fps=10, dpi=250)
+ani.save(str(save_dir) + f"/{var}-topview.mp4", writer="ffmpeg", fps=6, dpi=250)
 plt.close()

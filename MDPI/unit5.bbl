@@ -1,5 +1,31 @@
 \begin{thebibliography}{999}
 
+\bibitem[Mandel \em{et~al.}(2011)Mandel, Beezley, and
+  Kochanski]{mandel_coupled_2011}
+Mandel, J.; Beezley, J.D.; Kochanski, A.K.
+\newblock Coupled atmosphere-wildland fire modeling with {WRF} 3.3 and {SFIRE}
+  2011.
+\newblock {\em Geosci. Model Dev.} {\bf 2011}, {\em 4},~591--610.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/gmd-4-591-2011}{\detokenize{10.5194/gmd-4-591-2011}}}.
+
+\bibitem[Mandel \em{et~al.}(2014)Mandel, Amram, Beezley, Kelman, Kochanski,
+  Kondratenko, Lynn, Regev, and Vejmelka]{mandel_recent_2014}
+Mandel, J.; Amram, S.; Beezley, J.D.; Kelman, G.; Kochanski, A.K.; Kondratenko,
+  V.Y.; Lynn, B.H.; Regev, B.; Vejmelka, M.
+\newblock Recent advances and applications of {WRF}–{SFIRE}.
+\newblock {\em Nat. Hazards Earth Syst. Sci.} {\bf 2014}, {\em 14},~2829--2845.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/nhess-14-2829-2014}{\detokenize{10.5194/nhess-14-2829-2014}}}.
+
+\bibitem[Coen(2018)]{coen_requirements_2018}
+Coen, J.
+\newblock Some {Requirements} for {Simulating} {Wildland} {Fire} {Behavior}
+  {Using} {Insight} from {Coupled} {Weather}—{Wildland} {Fire} {Models}.
+\newblock {\em Fire} {\bf 2018}, {\em 1},~6.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/fire1010006}{\detokenize{10.3390/fire1010006}}}.
+
 \bibitem[Kochanski \em{et~al.}(2018)Kochanski, Fournier, and
   Mandel]{kochanski_experimental_2018}
 Kochanski, A.; Fournier, A.; Mandel, J.
@@ -7,6 +33,71 @@ Kochanski, A.; Fournier, A.; Mandel, J.
 \newblock {\em Atmosphere} {\bf 2018}, {\em 9},~296.
 \newblock
   doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/atmos9080296}{\detokenize{10.3390/atmos9080296}}}.
+
+\bibitem[Butler \em{et~al.}(2016)Butler, Teske, Jimenez, O'Brien, Sopko, Wold,
+  Vosburgh, Hornsby, and Loudermilk]{butler_observations_2016}
+Butler, B.; Teske, C.; Jimenez, D.; O'Brien, J.; Sopko, P.; Wold, C.; Vosburgh,
+  M.; Hornsby, B.; Loudermilk, E.
+\newblock Observations of energy transport and rate of spreads from
+  low-intensity fires in longleaf pine habitat – {RxCADRE} 2012.
+\newblock {\em Int. J. Wildland Fire} {\bf 2016}, {\em 25},~76.
+\newblock
+  doi:{\changeurlcolor{black}\href{https://doi.org/10.1071/WF14154}{\detokenize{10.1071/WF14154}}}.
+
+\bibitem[Hudak and Bright(2014)]{hudak_data_2014}
+Hudak, A.T.; Bright, B.C.
+\newblock RxCADRE 2008, 2011, and 2012: Burn blocks.
+\newblock Fort Collins, CO: Forest Service Research Data Archive.
+  https://doi.org/10.2737/RDS-2014-0031,  2014.
+\newblock Accessed: 2021-12-05.
+
+\bibitem[Hudak \em{et~al.}(2016)Hudak, Bright, and Kremens]{hudak_data_2016}
+Hudak, A.T.; Bright, B.C.; Kremens, Robert L.and~Dickinson, M.B.
+\newblock RxCADRE 2011 and 2012: Wildfire Airborne Sensor Program long wave
+  infrared calibrated image mosaics.
+\newblock Fort Collins, CO: Forest Service Research Data Archive.
+  https://doi.org/10.2737/RDS-2016-0008,  2016.
+\newblock Accessed: 2021-12-05.
+
+\bibitem[Seto and Clements(2015{\natexlab{a}})]{seto_csu_data_2016}
+Seto, D.; Clements, C.B.
+\newblock RxCADRE 2012: CSU-MAPS wind LiDAR velocity and microwave
+  temperature/relative humidity profiler data.
+\newblock Fort Collins, CO: Forest Service Research Data Archive.
+  https://doi.org/10.2737/RDS-2015-0026,  2015.
+\newblock Accessed: 2021-12-05.
+
+\bibitem[Seto and Clements(2015{\natexlab{b}})]{seto_data_2016}
+Seto, D.; Clements, C.B.
+\newblock RxCADRE 2012: In-situ wind, air temperature, barometric pressure, and
+  heat flux time series data.
+\newblock Fort Collins, CO: Forest Service Research Data Archive.
+  https://doi.org/10.2737/RDS-2015-0048,  2015.
+\newblock Accessed: 2021-12-05.
+
+\bibitem[Hudak \em{et~al.}(2017)Hudak, Bright, Williams, and
+  Hiers]{hudak_data_2017}
+Hudak, A.T.; Bright, B.C.; Williams, B.W.; Hiers, J.K.
+\newblock RxCADRE 2011 and 2012: Ignition data.
+\newblock Fort Collins, CO: Forest Service Research Data Archive. Updated 31
+  May 2018. https://doi.org/10.2737/RDS-2017-0065,  2017.
+\newblock Accessed: 2021-12-05.
+
+\bibitem[Ottmar and Restaino(2014)]{ottmar_data_2016}
+Ottmar, R.D.; Restaino, J.C.
+\newblock RxCADRE 2008, 2011, and 2012: Ground fuel measurements from
+  prescribed fires.
+\newblock Fort Collins, CO: Forest Service Research Data Archive.
+  https://doi.org/10.2737/RDS-2014-0028,  2014.
+\newblock Accessed: 2021-12-05.
+
+\bibitem[Urbanski(2014)]{urbanski_data_2016}
+Urbanski, S.P.
+\newblock RxCADRE 2012: Airborne measurements of smoke emission and dispersion
+  from prescribed fires.
+\newblock Fort Collins, CO: Forest Service Research Data Archive.
+  https://doi.org/10.2737/RDS-2014-0015,  2014.
+\newblock Accessed: 2021-12-05.
 
 \bibitem[Mallia \em{et~al.}(2020)Mallia, Kochanski, Urbanski, Mandel, Farguell,
   and Krueger]{mallia_incorporating_2020}
@@ -29,14 +120,6 @@ Kochanski, A.K.; Jenkins, M.A.; Mandel, J.; Beezley, J.D.; Clements, C.B.;
 \newblock
   doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/gmd-6-1109-2013}{\detokenize{10.5194/gmd-6-1109-2013}}}.
 
-\bibitem[Coen(2018)]{coen_requirements_2018}
-Coen, J.
-\newblock Some {Requirements} for {Simulating} {Wildland} {Fire} {Behavior}
-  {Using} {Insight} from {Coupled} {Weather}—{Wildland} {Fire} {Models}.
-\newblock {\em Fire} {\bf 2018}, {\em 1},~6.
-\newblock
-  doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/fire1010006}{\detokenize{10.3390/fire1010006}}}.
-
 \bibitem[Thompson \em{et~al.}(2020)Thompson, Schroeder, Wilkinson, Barber,
   Baxter, Cameron, Hsieh, Marshall, Moore, Refai, Rodell, Schiks, Verkaik, and
   Zerb]{thompson_recent_2020}
@@ -49,24 +132,6 @@ Thompson, D.K.; Schroeder, D.; Wilkinson, S.L.; Barber, Q.; Baxter, G.;
 \newblock {\em Fire} {\bf 2020}, {\em 3},~28.
 \newblock
   doi:{\changeurlcolor{black}\href{https://doi.org/10.3390/fire3030028}{\detokenize{10.3390/fire3030028}}}.
-
-\bibitem[Mandel \em{et~al.}(2011)Mandel, Beezley, and
-  Kochanski]{mandel_coupled_2011}
-Mandel, J.; Beezley, J.D.; Kochanski, A.K.
-\newblock Coupled atmosphere-wildland fire modeling with {WRF} 3.3 and {SFIRE}
-  2011.
-\newblock {\em Geosci. Model Dev.} {\bf 2011}, {\em 4},~591--610.
-\newblock
-  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/gmd-4-591-2011}{\detokenize{10.5194/gmd-4-591-2011}}}.
-
-\bibitem[Mandel \em{et~al.}(2014)Mandel, Amram, Beezley, Kelman, Kochanski,
-  Kondratenko, Lynn, Regev, and Vejmelka]{mandel_recent_2014}
-Mandel, J.; Amram, S.; Beezley, J.D.; Kelman, G.; Kochanski, A.K.; Kondratenko,
-  V.Y.; Lynn, B.H.; Regev, B.; Vejmelka, M.
-\newblock Recent advances and applications of {WRF}–{SFIRE}.
-\newblock {\em Nat. Hazards Earth Syst. Sci.} {\bf 2014}, {\em 14},~2829--2845.
-\newblock
-  doi:{\changeurlcolor{black}\href{https://doi.org/10.5194/nhess-14-2829-2014}{\detokenize{10.5194/nhess-14-2829-2014}}}.
 
 \bibitem[Thompson(2020)]{thompson_data_2020}
 Thompson, D.K.

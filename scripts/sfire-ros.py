@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 domain = "fire"
 unit = "unit5"
-modelrun = "F6V51M08Z22I04T"
+modelrun = "F6V51M08Z22D59I04"
 from pylab import *
 
 levels_ros = np.arange(10, 500, 20)
@@ -244,12 +244,12 @@ else:
 
 
 shape = XLAT.shape
-ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 12))
+ax_map.set_xticks(np.linspace(bm.lonmin, bm.lonmax, 13))
 labels = [item.get_text() for item in ax_map.get_xticklabels()]
 xlabels = np.arange(0, shape[1] * fs, shape[1] * fs / len(labels)).astype(int)
 ax_map.set_xticklabels(xlabels, fontsize=11)
 
-ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 6))
+ax_map.set_yticks(np.linspace(bm.latmin, bm.latmax, 5))
 labels = [item.get_text() for item in ax_map.get_yticklabels()]
 ylabels = np.arange(0, shape[0] * fs, shape[0] * fs / len(labels)).astype(int)
 ax_map.set_yticklabels(ylabels, fontsize=11)
