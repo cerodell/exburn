@@ -102,5 +102,5 @@ def update_plot(i):
 
 fig.tight_layout()
 ani = animation.FuncAnimation(fig, update_plot, dimT, interval=3)
-ani.save(str(save_dir) + f"/{var}-topview.mp4", writer="ffmpeg", fps=10, dpi=250)
+ani.save(str(save_dir) + f"/{var}-topview.mp4", writer="ffmpeg", fps=10, dpi=300)
 plt.close()

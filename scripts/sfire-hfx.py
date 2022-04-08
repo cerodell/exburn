@@ -294,7 +294,7 @@ g2 = sns.boxplot(
 g2.set(title="Maximum Heat Flux")
 ax.set_ylabel("Heat Flux \n" + r"$(\mathrm{~kW} \mathrm{~m}^{-2})$")
 ax.set_xlabel("")
-plt.savefig(str(save_dir) + f"/hfx-comparison.png", dpi=250, bbox_inches="tight")
+plt.savefig(str(save_dir) + f"/hfx-comparison.png", dpi=300, bbox_inches="tight")
 
 # ax.legend(
 #     loc="upper center",
