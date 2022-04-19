@@ -6,7 +6,7 @@
 ```
 2. Unpack the program:
 ```
-[~]$ unzip 'a2c3118f08ce424885705e9155b127ea28879f8b.zip'
+[~]$ unzip a2c3118f08ce424885705e9155b127ea28879f8b.zip
 [~]$ mv WRF-SFIRE-a2c3118f08ce424885705e9155b127ea28879f8b ./WRF-SFIRE
 [~]$ ls
 
@@ -23,7 +23,7 @@ context.py
 
 NOTE this step insnt need but will make runtimes faster and wrfout files small. This is becasue its not writing nearly as much data to the wrfoutfiles.
 ```
-cd ~/exburn/WRF-SFIRE
+cd WRF-SFIRE
 ls
 
 arch   compile      configure.wrf         dyn_em    frame  LICENSE.txt  phys       README-SFIRE.md  share       tools
@@ -31,7 +31,7 @@ chem   compile.log  configure.wrf.backup  dyn_nmm   hydro  main         README  
 clean  configure    doc                   external  inc    Makefile     README.md  run              test        wrftladj
 
 rm -rf Registry
-cp -r ~/exburn/burns/Registry  ~/exburn/WRF-SFIRE/
+mv -r ../Registry  .
 ```
 
 
@@ -49,8 +49,9 @@ Currently Loaded Modules:
 
 ```
 4. Set the environment variables and configure the program:
+
 ```
-[~]$ cd SFIRE
+[~]$ cd WRF-SFIRE
 [~]$ ls
 arch  clean    configure  dyn_em   external  hydro  LICENSE.txt  Makefile  README     Registry  share  tools  wrftladj
 chem  compile  doc        dyn_nmm  frame     inc    main         phys      README.md  run       test   var
@@ -65,7 +66,12 @@ export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 [~] ./clean -a
 ```
 
-6. Run: ./configure, choose nesting 1=basic.
+6. Run: ./configure,
+- Please select from among the following Linux x86_64 options:
+  - 15
+
+- choose nesting
+  -  1=basic.
 
 ```
 [~] ./configure
