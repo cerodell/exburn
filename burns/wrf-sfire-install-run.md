@@ -130,9 +130,26 @@ Review the compile log to make sure there are no errors. Successful installation
 
 1. Create folder directories for your simulations. This repo has the unit5 simulation under `~/burns/unit5/`
 
+2. Make symlinks to key wrf files in folder
 
-2. Submit `setup.sh` shell script from `~/bin`
-This create symlinks to wrf.exe and other dependencies in your desired simulation folder. You'll need to edit the `CASE=` for your simulations.
+```
+ln -sv ../../WRF-SFIRE/main/wrf.exe
+ln -sv ../../WRF-SFIRE/main/ideal.exe
+
+ln -sv ../../WRF-SFIRE/run/GENPARM.TBL
+ln -sv ../../WRF-SFIRE/run/RRTMG_LW_DATA
+ln -sv ../../WRF-SFIRE/run/RRTMG_SW_DATA
+ln -sv ../../WRF-SFIRE/run/SOILPARM.TBL
+ln -sv ../../WRF-SFIRE/run/URBPARM.TBL
+ln -sv ../../WRF-SFIRE/run/VEGPARM.TBL
+ln -sv ../../WRF-SFIRE/run/ETAMPNEW_DATA
+ln -sv ../inputs/LANDUSE.TBL
+
+```
+
+
+3. Submit `setup.sh` shell script from `~/bin`
+This create symlinks to wrf.exe and other dependencies in your desired simulation folder.
 
 ```
 [~] cd bin
