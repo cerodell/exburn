@@ -35,12 +35,18 @@ fs = 5  # fire mesh ratio
 ndx = 160  # EW number of grids
 ndy = 400  # NS number of grids
 skin = 290  # skin surface temperature
-buff = 40  # buffer size (ie firebreaks) around units
+buff = 15  # buffer size (ie firebreaks) around units
 fueltype = 6  # anderson fuels type
-ig_start = [55.7177497, -113.5713062]
-ig_end = [55.7177507, -113.5751922]
-sw = [55.717153, -113.57668]
-ne = [55.720270, -113.569517]
+# ig_start = [55.7177497, -113.5713062] # unit 5
+# ig_end = [55.7177507, -113.5751922] # unit 5
+# sw = [55.717153, -113.57668] # unit 5
+# ne = [55.720270, -113.569517] # unit 5
+
+ig_start = [55.71049, -113.56747]  # unit 4
+ig_end = [55.71040, -113.56971]  # unit 4
+sw = [55.70897, -113.57282]  # unit 4
+ne = [55.71499, -113.56280]  # unit 4
+
 fireshape_path = str(data_dir) + "/all_units/mygeodata_merged"
 ll_utm = [
     336524,
@@ -135,84 +141,98 @@ for i in range(len(bm.units)):
     unit = path.Path(bm.units[i])
     unit_mask = unit.contains_points(ravel_array)
     unit_mask = np.reshape(unit_mask, np.shape(XLONG))
-    buff = path.Path(bm.buff[i])
-    buffer_mask = buff.contains_points(ravel_array)
-    buffer_mask = np.reshape(buffer_mask, np.shape(XLONG))
-    fuel[buffer_mask != unit_mask] = 14  ## define fire breaks as non-fuel
-
-
-for i in range(len(bm.units)):
-    unit = path.Path(bm.units[i])
-    unit_mask = unit.contains_points(ravel_array)
-    unit_mask = np.reshape(unit_mask, np.shape(XLONG))
     fuel[unit_mask] = fueltype
 
+for i in range(len(bm.units)):
+    if i == 2:
+        pass
+    else:
+        unit = path.Path(bm.units[i])
+        unit_mask = unit.contains_points(ravel_array)
+        unit_mask = np.reshape(unit_mask, np.shape(XLONG))
+        buff = path.Path(bm.buff[i])
+        buffer_mask = buff.contains_points(ravel_array)
+        buffer_mask = np.reshape(buffer_mask, np.shape(XLONG))
+        fuel[buffer_mask != unit_mask] = 14  ## define fire breaks as non-fuel
+
+
+# for i in range(len(bm.units)):
+#     unit = path.Path(bm.units[i])
+#     unit_mask = unit.contains_points(ravel_array)
+#     unit_mask = np.reshape(unit_mask, np.shape(XLONG))
+#     fuel[unit_mask] = fueltype
+
+
 # %%
+
+
+# %%
+## unit 5 buffer with specital polygone
 ## create buffer around each unit plot
-gdf = gpd.read_file(str(data_dir) + "/final/unit_5.shp")
-gdf = gdf.to_crs(epsg=26912)
-gdf["geometry"] = gdf.geometry.buffer(10)
-gdf.to_file(str(root_dir) + "/data/shp/extend_5.shp", driver="ESRI Shapefile")
-gdf = gpd.read_file(str(root_dir) + "/data/shp/extend_5.shp")
-gdf = gdf.to_crs(epsg=4326)
-gdf.to_file(str(root_dir) + "/data/shp/extend_5.shp", driver="ESRI Shapefile")
-
-gdf = gpd.read_file(str(root_dir) + "/data/shp/extend_5.shp")
 # gdf = gpd.read_file(str(data_dir) + "/final/unit_5.shp")
-gdf = gdf.to_crs(epsg=26912)
-gdf["geometry"] = gdf.geometry.buffer(10)
-gdf.to_file(str(root_dir) + "/data/shp/buff_5.shp", driver="ESRI Shapefile")
-gdf = gpd.read_file(str(root_dir) + "/data/shp/buff_5.shp")
-gdf = gdf.to_crs(epsg=4326)
-gdf.to_file(str(root_dir) + "/data/shp/buff_5.shp", driver="ESRI Shapefile")
+# gdf = gdf.to_crs(epsg=26912)
+# gdf["geometry"] = gdf.geometry.buffer(10)
+# gdf.to_file(str(root_dir) + "/data/shp/extend_5.shp", driver="ESRI Shapefile")
+# gdf = gpd.read_file(str(root_dir) + "/data/shp/extend_5.shp")
+# gdf = gdf.to_crs(epsg=4326)
+# gdf.to_file(str(root_dir) + "/data/shp/extend_5.shp", driver="ESRI Shapefile")
+
+# gdf = gpd.read_file(str(root_dir) + "/data/shp/extend_5.shp")
+# # gdf = gpd.read_file(str(data_dir) + "/final/unit_5.shp")
+# gdf = gdf.to_crs(epsg=26912)
+# gdf["geometry"] = gdf.geometry.buffer(10)
+# gdf.to_file(str(root_dir) + "/data/shp/buff_5.shp", driver="ESRI Shapefile")
+# gdf = gpd.read_file(str(root_dir) + "/data/shp/buff_5.shp")
+# gdf = gdf.to_crs(epsg=4326)
+# gdf.to_file(str(root_dir) + "/data/shp/buff_5.shp", driver="ESRI Shapefile")
 
 
-gdf = gpd.read_file(str(data_dir) + "/mini_5/mini_5.shp")
-gdf = gdf.to_crs(epsg=26912)
-gdf["geometry"] = gdf.geometry.buffer(-8)
-gdf.to_file(str(root_dir) + "/data/shp/buff_mini_5.shp", driver="ESRI Shapefile")
-gdf = gpd.read_file(str(root_dir) + "/data/shp/buff_mini_5.shp")
-gdf = gdf.to_crs(epsg=4326)
-gdf.to_file(str(root_dir) + "/data/shp/buff_mini_5.shp", driver="ESRI Shapefile")
+# gdf = gpd.read_file(str(data_dir) + "/mini_5/mini_5.shp")
+# gdf = gdf.to_crs(epsg=26912)
+# gdf["geometry"] = gdf.geometry.buffer(-8)
+# gdf.to_file(str(root_dir) + "/data/shp/buff_mini_5.shp", driver="ESRI Shapefile")
+# gdf = gpd.read_file(str(root_dir) + "/data/shp/buff_mini_5.shp")
+# gdf = gdf.to_crs(epsg=4326)
+# gdf.to_file(str(root_dir) + "/data/shp/buff_mini_5.shp", driver="ESRI Shapefile")
 
-buff_5 = bm.readshapefile(
-    str(root_dir) + "/data/shp/buff_5",
-    name="buff_5",
-    drawbounds=True,
-    color="red",
-)
+# buff_5 = bm.readshapefile(
+#     str(root_dir) + "/data/shp/buff_5",
+#     name="buff_5",
+#     drawbounds=True,
+#     color="red",
+# )
 
-buff_5 = path.Path(bm.buff_5[0])
-buff_5_mask = buff_5.contains_points(ravel_array)
-buff_5_mask = np.reshape(buff_5_mask, np.shape(XLONG))
-fuel[buff_5_mask] = 14  ## define fire breaks as non-fuel
-
-
-polygon_5 = bm.readshapefile(
-    str(root_dir) + "/data/shp/extend_5",
-    # str(data_dir) + "/unit_5/unit_5",
-    name="unit_5",
-    drawbounds=True,
-    color="red",
-)
-
-unit5_final = path.Path(bm.unit_5[0])
-unit5_final_mask = unit5_final.contains_points(ravel_array)
-unit5_final_mask = np.reshape(unit5_final_mask, np.shape(XLONG))
-fuel[unit5_final_mask] = fueltype  ## define fire breaks as non-fuel
+# buff_5 = path.Path(bm.buff_5[0])
+# buff_5_mask = buff_5.contains_points(ravel_array)
+# buff_5_mask = np.reshape(buff_5_mask, np.shape(XLONG))
+# fuel[buff_5_mask] = 14  ## define fire breaks as non-fuel
 
 
-buff_mini_5 = bm.readshapefile(
-    str(root_dir) + "/data/shp/buff_mini_5",
-    name="buff_mini_5",
-    drawbounds=True,
-    color="red",
-)
+# polygon_5 = bm.readshapefile(
+#     str(root_dir) + "/data/shp/extend_5",
+#     # str(data_dir) + "/unit_5/unit_5",
+#     name="unit_5",
+#     drawbounds=True,
+#     color="red",
+# )
 
-buff_mini_5 = path.Path(bm.buff_mini_5[0])
-buff_mini_5_mask = buff_mini_5.contains_points(ravel_array)
-buff_mini_5_mask = np.reshape(buff_mini_5_mask, np.shape(XLONG))
-fuel[buff_mini_5_mask] = fueltype  ## define fire breaks as non-fuel
+# unit5_final = path.Path(bm.unit_5[0])
+# unit5_final_mask = unit5_final.contains_points(ravel_array)
+# unit5_final_mask = np.reshape(unit5_final_mask, np.shape(XLONG))
+# fuel[unit5_final_mask] = fueltype  ## define fire breaks as non-fuel
+
+
+# buff_mini_5 = bm.readshapefile(
+#     str(root_dir) + "/data/shp/buff_mini_5",
+#     name="buff_mini_5",
+#     drawbounds=True,
+#     color="red",
+# )
+
+# buff_mini_5 = path.Path(bm.buff_mini_5[0])
+# buff_mini_5_mask = buff_mini_5.contains_points(ravel_array)
+# buff_mini_5_mask = np.reshape(buff_mini_5_mask, np.shape(XLONG))
+# fuel[buff_mini_5_mask] = fueltype  ## define fire breaks as non-fuel
 
 
 # polygon_5 = bm.readshapefile(
@@ -324,6 +344,7 @@ def findige(ig_start, ig_end, line, color):
     return igs, ige
 
 
+# %%
 # igs, ige = findige(ig_start, ig_end)
 # UNIT 4 WESTERLY
 plt.figure(figsize=(10, 8))
@@ -351,49 +372,51 @@ plt.savefig(str(img_dir) + "/unit-domain.png")
 plt.show()
 
 
-# igs, ige = findige(ig_start, ig_end)
-plt.figure(figsize=(10, 8))
-plt.title("CLOSEUP OF THE FIRE PLOT MULTI IGNITIONS")
-bmX = Basemap(
-    llcrnrlon=XLONG[nsew[1], nsew[3]],
-    llcrnrlat=XLAT[nsew[1], nsew[3]],
-    urcrnrlon=XLONG[nsew[0], nsew[2]],
-    urcrnrlat=XLAT[nsew[0], nsew[2]],
-    epsg=4326,
-)
-polygonsX = bmX.readshapefile(
-    str(root_dir) + "/data/unit_5/unit_5", name="unit_5", drawbounds=True, color="red"
-)
+# %%
 
-bmX.pcolormesh(
-    XLONG[nsew[1] : nsew[0], nsew[3] : nsew[2]],
-    XLAT[nsew[1] : nsew[0], nsew[3] : nsew[2]],
-    fuel[nsew[1] : nsew[0], nsew[3] : nsew[2]],
-)
-plt.colorbar(orientation="horizontal", label="fuel category")
-igs_01, ige_01 = findige(
-    [55.7177529, -113.5713107], [55.71773480, -113.57183453], line="1", color="red"
-)
-igs_02, ige_02 = findige(
-    [55.7177109, -113.5721005], [55.7177016, -113.5728363], line="2", color="blue"
-)
-igs_03, ige_03 = findige(
-    [55.7177293, -113.5734885], [55.7177437, -113.5744894], line="3", color="green"
-)
-igs_04, ige_04 = findige(
-    [55.7177775603, -113.5747705233],
-    [55.717752429, -113.575192125],
-    line="4",
-    color="black",
-)
+# # igs, ige = findige(ig_start, ig_end)
+# plt.figure(figsize=(10, 8))
+# plt.title("CLOSEUP OF THE FIRE PLOT MULTI IGNITIONS")
+# bmX = Basemap(
+#     llcrnrlon=XLONG[nsew[1], nsew[3]],
+#     llcrnrlat=XLAT[nsew[1], nsew[3]],
+#     urcrnrlon=XLONG[nsew[0], nsew[2]],
+#     urcrnrlat=XLAT[nsew[0], nsew[2]],
+#     epsg=4326,
+# )
+# polygonsX = bmX.readshapefile(
+#     str(root_dir) + "/data/unit_5/unit_5", name="unit_5", drawbounds=True, color="red"
+# )
 
-# igs_01, ige_01 = findige([55.7177529, -113.5713107], [55.71773480, -113.57183453], line = '1', color = 'red')
-# igs_02, ige_02 = findige([55.71774808, -113.57232778], [55.71771973, -113.57299677], line = '2', color = 'blue')
-# igs_03, ige_03 = findige([55.71771900, -113.57341997], [55.7177473680, -113.5742683254], line = '3', color = 'green')
-# igs_04, ige_04 = findige([55.7177775603, -113.5747705233], [55.717752429, -113.575192125], line = '4', color = 'black')
-plt.legend()
-plt.savefig(str(img_dir) + "/unit-domain.png")
-plt.show()
+# bmX.pcolormesh(
+#     XLONG[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+#     XLAT[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+#     fuel[nsew[1] : nsew[0], nsew[3] : nsew[2]],
+# )
+# plt.colorbar(orientation="horizontal", label="fuel category")
+# igs_01, ige_01 = findige(
+#     [55.7177529, -113.5713107], [55.71773480, -113.57183453], line="1", color="red"
+# )
+# igs_02, ige_02 = findige(
+#     [55.7177109, -113.5721005], [55.7177016, -113.5728363], line="2", color="blue"
+# )
+# igs_03, ige_03 = findige(
+#     [55.7177293, -113.5734885], [55.7177437, -113.5744894], line="3", color="green"
+# )
+# igs_04, ige_04 = findige(
+#     [55.7177775603, -113.5747705233],
+#     [55.717752429, -113.575192125],
+#     line="4",
+#     color="black",
+# )
+
+# # igs_01, ige_01 = findige([55.7177529, -113.5713107], [55.71773480, -113.57183453], line = '1', color = 'red')
+# # igs_02, ige_02 = findige([55.71774808, -113.57232778], [55.71771973, -113.57299677], line = '2', color = 'blue')
+# # igs_03, ige_03 = findige([55.71771900, -113.57341997], [55.7177473680, -113.5742683254], line = '3', color = 'green')
+# # igs_04, ige_04 = findige([55.7177775603, -113.5747705233], [55.717752429, -113.575192125], line = '4', color = 'black')
+# plt.legend()
+# plt.savefig(str(img_dir) + "/unit-domain.png")
+# plt.show()
 
 
 # %%
@@ -514,75 +537,75 @@ plt.show()
 # EVERYTHNG BELOW THIS STEP IS OPTIONAL TOOLS FOR VISUALIZATION
 # This installs a some mad satellite data hub, cuz the old script for WMS landsat pulling is dead
 
-# This configures it to my personal account: I am on trial for 30 days (April 21, 2021) - it will likely die after
-from sentinelhub import SHConfig
-from PIL import Image
-from io import BytesIO
+# # This configures it to my personal account: I am on trial for 30 days (April 21, 2021) - it will likely die after
+# from sentinelhub import SHConfig
+# from PIL import Image
+# from io import BytesIO
 
 
-config = SHConfig()
-config.instance_id = "e0803795-1f6d-4887-bd64-e619f6d7a17a"
-config.sh_client_id = "22f4a73a-6cc5-4856-8e34-5e61196b496b"
-config.sh_client_secret = "8ebcd565-9d69-4bed-8885-8383e5200c6d"
-config.save()
+# config = SHConfig()
+# config.instance_id = "e0803795-1f6d-4887-bd64-e619f6d7a17a"
+# config.sh_client_id = "22f4a73a-6cc5-4856-8e34-5e61196b496b"
+# config.sh_client_secret = "8ebcd565-9d69-4bed-8885-8383e5200c6d"
+# config.save()
 
-# Subset the landsat times to needed bounding box
-from sentinelhub import WmsRequest, WcsRequest, MimeType, CRS, BBox, DataCollection
+# # Subset the landsat times to needed bounding box
+# from sentinelhub import WmsRequest, WcsRequest, MimeType, CRS, BBox, DataCollection
 
-bounding_coords = [UTMx[0, 0], UTMy[0, 0], UTMx[-1, -1], UTMy[-1, -1]]
-get_bbox = BBox(bbox=bounding_coords, crs=CRS.UTM_12N)
+# bounding_coords = [UTMx[0, 0], UTMy[0, 0], UTMx[-1, -1], UTMy[-1, -1]]
+# get_bbox = BBox(bbox=bounding_coords, crs=CRS.UTM_12N)
 
-layer = "TRUE_COLOR"
-time = "latest"
-width = 512
-height = 856
+# layer = "TRUE_COLOR"
+# time = "latest"
+# width = 512
+# height = 856
 
-# pull the landsat image
-wms_true_color_request = WmsRequest(
-    data_folder=str(root_dir) + "/img/",
-    data_collection=DataCollection.SENTINEL2_L1C,
-    layer=layer,
-    bbox=get_bbox,
-    time=time,
-    width=width,
-    height=height,
-    image_format=MimeType.TIFF,
-    config=config,
-)
-wms_true_color_img = wms_true_color_request.get_data(save_data=True)
-
-
-# This plots the image you pull on the current basemap instance
-def plot_image(image, factor=1):
-    """
-    Utility function for plotting RGB images.
-    """
-    fig = plt.subplots(nrows=1, ncols=1, figsize=(15, 7))
-
-    if np.issubdtype(image.dtype, np.floating):
-        bm.imshow(np.minimum(image * factor, 1))
-        print("1")
-    else:
-        bm.imshow(image, origin="upper")
-        print("2")
+# # pull the landsat image
+# wms_true_color_request = WmsRequest(
+#     data_folder=str(root_dir) + "/img/",
+#     data_collection=DataCollection.SENTINEL2_L1C,
+#     layer=layer,
+#     bbox=get_bbox,
+#     time=time,
+#     width=width,
+#     height=height,
+#     image_format=MimeType.TIFF,
+#     config=config,
+# )
+# wms_true_color_img = wms_true_color_request.get_data(save_data=True)
 
 
-plot_image(wms_true_color_img[-1])
+# # This plots the image you pull on the current basemap instance
+# def plot_image(image, factor=1):
+#     """
+#     Utility function for plotting RGB images.
+#     """
+#     fig = plt.subplots(nrows=1, ncols=1, figsize=(15, 7))
+
+#     if np.issubdtype(image.dtype, np.floating):
+#         bm.imshow(np.minimum(image * factor, 1))
+#         print("1")
+#     else:
+#         bm.imshow(image, origin="upper")
+#         print("2")
 
 
-# fig = plt.subplots(nrows=1, ncols=1, frameon=False)
-# bm.imshow(wms_true_color_img[-1], origin='upper')
-# plt.savefig('/Users/rodell/Desktop/test2.tiff', bbox_inches='tight',pad_inches=0)
-# #This saves image to disk as geotiff
-wms_true_color_request = WmsRequest(
-    data_collection=DataCollection.SENTINEL2_L1C,
-    data_folder=str(root_dir) + "/img/",
-    layer=layer,
-    bbox=get_bbox,
-    time=time,
-    width=width,
-    height=height,
-    image_format=MimeType.TIFF,
-    config=config,
-)
-wms_true_color_request.save_data()
+# plot_image(wms_true_color_img[-1])
+
+
+# # fig = plt.subplots(nrows=1, ncols=1, frameon=False)
+# # bm.imshow(wms_true_color_img[-1], origin='upper')
+# # plt.savefig('/Users/rodell/Desktop/test2.tiff', bbox_inches='tight',pad_inches=0)
+# # #This saves image to disk as geotiff
+# wms_true_color_request = WmsRequest(
+#     data_collection=DataCollection.SENTINEL2_L1C,
+#     data_folder=str(root_dir) + "/img/",
+#     layer=layer,
+#     bbox=get_bbox,
+#     time=time,
+#     width=width,
+#     height=height,
+#     image_format=MimeType.TIFF,
+#     config=config,
+# )
+# wms_true_color_request.save_data()

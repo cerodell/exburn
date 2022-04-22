@@ -133,17 +133,17 @@ Review the compile log to make sure there are no errors. Successful installation
 2. Make symlinks to key wrf files in folder
 
 ```
-ln -sv ../../WRF-SFIRE/main/wrf.exe
-ln -sv ../../WRF-SFIRE/main/ideal.exe
+ln -sv ../../../WRF-SFIRE/main/wrf.exe
+ln -sv ../../../WRF-SFIRE/main/ideal.exe
 
-ln -sv ../../WRF-SFIRE/run/GENPARM.TBL
-ln -sv ../../WRF-SFIRE/run/RRTMG_LW_DATA
-ln -sv ../../WRF-SFIRE/run/RRTMG_SW_DATA
-ln -sv ../../WRF-SFIRE/run/SOILPARM.TBL
-ln -sv ../../WRF-SFIRE/run/URBPARM.TBL
-ln -sv ../../WRF-SFIRE/run/VEGPARM.TBL
-ln -sv ../../WRF-SFIRE/run/ETAMPNEW_DATA
-ln -sv ../inputs/LANDUSE.TBL
+ln -sv ../../../WRF-SFIRE/run/GENPARM.TBL
+ln -sv ../../../WRF-SFIRE/run/RRTMG_LW_DATA
+ln -sv ../../../WRF-SFIRE/run/RRTMG_SW_DATA
+ln -sv ../../../WRF-SFIRE/run/SOILPARM.TBL
+ln -sv ../../../WRF-SFIRE/run/URBPARM.TBL
+ln -sv ../../../WRF-SFIRE/run/VEGPARM.TBL
+ln -sv ../../../WRF-SFIRE/run/ETAMPNEW_DATA
+ln -sv ../../inputs/LANDUSE.TBL
 
 ```
 
