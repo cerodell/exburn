@@ -7,6 +7,8 @@ __pycache__/
 *.so
 
 # my docs
+wrfinput_d01
+wrfout_*
 WRF-SFIRE/
 a2c3118f08ce424885705e9155b127ea28879f8b.zip
 phd-docs/

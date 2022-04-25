@@ -1,0 +1,72 @@
+&fuel_scalars                      ! scalar fuel constants
+!cmbcnst  = 17.433e+06,            ! J/kg heat of combustion of dry fuel
+cmbcnst  = 16.4e+06,               ! J/kg heat of combustion of dry fuel - adjusted based on Overholt 2012
+hfgl     = 17.e4 ,                 ! W/m^2 threshold heat flux required to ignite canopy
+fuelmc_g = 0.08,                   ! surface dead fuel moisture, set = 0 for dry
+fuelmc_c = 1.0,                    ! canopy fuel moisture, set = 0 for dry
+nfuelcats = 13,                    ! number of fuel categories used
+no_fuel_cat = 14                   ! extra category for no fuel
+/
+
+&fuel_categories
+ fuel_name =
+'1: Short grass (1 ft)',
+'2: Timber (grass and understory)',
+'3: Tall grass (2.5 ft)',
+'4: Chaparral (6 ft)',
+'5: Brush (2 ft) ',
+'6: Dormant brush, hardwood slash',
+'7: Southern rough',
+'8: Closed timber litter',
+'9: Hardwood litter',
+'10: Timber (litter + understory)',
+'11: Light logging slash',
+'12: Medium logging slash',
+'13: Heavy logging slash',
+'14: no fuel'
+
+!mass loading (in kg m-2)
+fgi =   0.166, 0.896, 0.674, 3.591, 0.784, 1.344, 1.091, 1.120, 0.780, 2.692, 2.582, 7.749, 13.024, 1.e-7,
+
+!fuel depth (m)
+fueldepthm=0.305, 0.305, 0.762, 1.829, 0.61,  0.762, 0.762, 0.061, 0.061, 0.305, 0.305, 0.701, 0.914, 0.305,
+
+!fuel surface-area-to-volume-ratio (m-1)
+savr = 3500., 2784., 1500., 1739., 1683., 1564., 1562., 1889., 2484., 1764., 1182., 1145., 1159., 3500.,
+
+!fuel moisture content of extinction (in percent expressed in decimal form, from 0.00 – 1.00).
+fuelmce = 0.12, 0.15, 0.25, 0.20, 0.20, 0.25, 0.40, 0.30, 0.25, 0.25, 0.15, 0.20, 0.25, 0.12,
+
+!fuel particle density lb ft-3 (32 if solid, 19 if rotten)
+ fueldens = 32.,32.,32.,32.,32.,32.,32. ,
+            32.,32.,32.,32.,32.,32.,32. , ! 32 if solid, 19 if rotten
+
+
+ st = 0.0555, 0.0555, 0.0555, 0.0555, 0.0555, 0.0555, 0.0555,
+      0.0555, 0.0555, 0.0555, 0.0555, 0.0555, 0.0555, 0.0555,
+ se = 0.010, 0.010, 0.010, 0.010, 0.010, 0.010, 0.010,
+      0.010, 0.010, 0.010, 0.010, 0.010, 0.010, 0.010,
+ ! ----- Notes on weight: (4) - best fit of Latham data;
+ !                 (5)-(7) could be 60-120; (8)-(10) could be 300-1600;
+ !                 (11)-(13) could be 300-1600
+ weight = 7.,  7.,  7., 180., 100., 100., 100.,
+         900., 900., 900., 900., 900., 900., 7. ,
+! !----- 1.12083 is 5 tons/acre.  5-50 tons/acre orig., 100-300 after blowdown
+! fci_d = 0., 0., 0., 1.123, 0., 0., 0.,
+!      1.121, 1.121, 1.121, 1.121, 1.121, 1.121, 0.,
+! fct = 60., 60., 60., 60., 60., 60., 60.,
+!      60., 120., 180., 180., 180., 180. , 60.,
+! ichap = 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  ! proportions of moisture classes in the fuel categories
+ ! must add up to  1 in each category
+  fmc_gw01 = 1.00000, 0.15385, 1.00000, 0.31253, 0.28571, 0.25000, 0.23203,
+             0.30000, 0.06625, 0.25042, 0.13021, 0.11600, 0.12065, 0.00000,
+  fmc_gw02 = 0.00000, 0.07692, 0.00000, 0.25016, 0.14286, 0.41667, 0.38398,
+             0.20000, 0.93034, 0.16639, 0.39149, 0.40584, 0.39656, 0.00000,
+  fmc_gw03 = 0.00000, 0.38462, 0.00000, 0.12477, 0.00000, 0.33333, 0.30801,
+             0.50000, 0.00341, 0.41680, 0.47830, 0.47816, 0.48279, 0.00000,
+  fmc_gw04 = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  fmc_gw05 = 0.00000, 0.38462, 0.00000, 0.31254, 0.57143, 0.00000, 0.07598,
+             0.00000, 0.00000, 0.16639, 0.00000, 0.00000, 0.00000, 0.00000,
+ /

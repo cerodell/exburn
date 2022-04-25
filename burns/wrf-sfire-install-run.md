@@ -2,7 +2,7 @@
 
 1. Download the code within `exburn/`:
 ```
-[~]$ wget https://github.com/openwfm/WRF-SFIRE/archive/a2c3118f08ce424885705e9155b127ea28879f8b.zip
+[~]$ git clone  https://github.com/openwfm/WRF-SFIRE/archive/a2c3118f08ce424885705e9155b127ea28879f8b.zip
 ```
 2. Unpack the program:
 ```
