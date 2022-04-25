@@ -31,7 +31,7 @@ chem   compile.log  configure.wrf.backup  dyn_nmm   hydro  main         README  
 clean  configure    doc                   external  inc    Makefile     README.md  run              test        wrftladj
 
 rm -rf Registry
-mv -r ../Registry  .
+mv ../burns/Registry  .
 ```
 
 
