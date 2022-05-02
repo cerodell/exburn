@@ -26,6 +26,9 @@ gog_dir = Path(
     "/Volumes/GoogleDrive/Shared drives/Research/FireSmoke/FieldWork/PelicanMountain"
 )
 met_dir = Path("/Volumes/GoogleDrive/Shared drives/")
+wrf_dir = Path("/bluesky/working/wrf2arl/")
+
+
 
 sys.path.insert(0, str(root_dir))
 sep = "*" * 30
