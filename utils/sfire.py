@@ -96,6 +96,90 @@ def sovle_pbl(fueltype):
     return PBLH
 
 
+def makeLL_new(domain, unit):
+    with open(str(root_dir) + "/json/config-new.json") as f:
+        config = json.load(f)
+    bounds = config[unit]["sfire"]["namelist"]
+    ds = bounds["dxy"]  # LES grid spacing
+    fs = bounds["fs"]  # fire mesh ratio
+    ndx = bounds["ndx"]  # EW number of grids
+    ndy = bounds["ndy"]  # NS number of grids
+    ll_utm = [
+        bounds["ll_utm"][0],
+        bounds["ll_utm"][1],
+    ]  # lower left corner of the domain in UTM coordinates (meters)
+    # ============ end of INPUTS==============
+    ## create grid WRF LAT/LONG with defined inputs
+    if domain == "met":
+        gridx, gridy = np.meshgrid(
+            np.arange(0, ds * ndx, int(ds)), np.arange(0, ds * ndy, int(ds))
+        )
+        ## stagger gird to fit on wrf_out
+        gridx, gridy = gridx - ds / 2, gridy - ds / 2
+        ## drop first row/colum to match size
+        gridx, gridy = gridx[1:, 1:], gridy[1:, 1:]
+        # now adding a georefernce we have UTM grid (technically UTM_12N, or EPSG:26912
+        UTMx = gridx + ll_utm[0]
+        UTMy = gridy + ll_utm[1]
+        ## transform into the same projection (for shapefiles and for basemaps)
+        wgs84 = pyproj.Proj("+init=EPSG:4326")
+        epsg26912 = pyproj.Proj("+init=EPSG:26912")
+        # reproject from UTM to WGS84
+        WGSx, WGSy = pyproj.transform(epsg26912, wgs84, UTMx.ravel(), UTMy.ravel())
+        XLONG, XLAT = np.reshape(WGSx, np.shape(UTMx)), np.reshape(WGSy, np.shape(UTMy))
+        XLAT = xr.DataArray(
+            name="XLAT",
+            data=XLAT,
+            dims=["south_north", "west_east"],
+        )
+        XLONG = xr.DataArray(
+            name="XLONG",
+            data=XLONG,
+            dims=["south_north", "west_east"],
+        )
+    elif domain == "fire":
+        ## create grid FIRE LAT/LONG with defined inputs
+        fire_gridx, fire_gridy = np.meshgrid(
+            np.arange(0, ds * ndx, int(ds / fs)), np.arange(0, ds * ndy, int(ds / fs))
+        )
+        fireX = xr.DataArray(
+            name="fireX",
+            data=fire_gridx,
+            dims=["south_north_subgrid", "west_east_subgrid"],
+        )
+        fireY = xr.DataArray(
+            name="fireY",
+            data=fire_gridy,
+            dims=["south_north_subgrid", "west_east_subgrid"],
+        )
+        # now adding a georefernce we have UTM grid (technically UTM_12N, or EPSG:26912
+        fire_UTMx = fire_gridx + ll_utm[0]
+        fire_UTMy = fire_gridy + ll_utm[1]
+        ## transform into the same projection (for shapefiles and for basemaps)
+        wgs84 = pyproj.Proj("+init=EPSG:4326")
+        epsg26912 = pyproj.Proj("+init=EPSG:26912")
+        # reproject from UTM to WGS84
+        fire_WGSx, fire_WGSy = pyproj.transform(
+            epsg26912, wgs84, fire_UTMx.ravel(), fire_UTMy.ravel()
+        )
+        fire_XLONG, fire_XLAT = np.reshape(fire_WGSx, np.shape(fire_UTMx)), np.reshape(
+            fire_WGSy, np.shape(fire_UTMy)
+        )
+        XLAT = xr.DataArray(
+            name="XLAT",
+            data=fire_XLAT,
+            dims=["south_north_subgrid", "west_east_subgrid"],
+        )
+        XLONG = xr.DataArray(
+            name="XLONG",
+            data=fire_XLONG,
+            dims=["south_north_subgrid", "west_east_subgrid"],
+        )
+    else:
+        raise ValueError("Invalid domain option")
+    return XLAT, XLONG
+
+
 def makeLL(domain, modelrun):
     bounds = config["unit5"]["sfire"][modelrun]["namelist"]
     ds = bounds["dxy"]  # LES grid spacing
