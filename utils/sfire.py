@@ -96,7 +96,7 @@ def sovle_pbl(fueltype):
     return PBLH
 
 
-def makeLL_new(domain, unit):
+def makeLL_new(domain, unit, stagger=True):
     with open(str(root_dir) + "/json/config-new.json") as f:
         config = json.load(f)
     bounds = config[unit]["sfire"]["namelist"]
@@ -115,7 +115,14 @@ def makeLL_new(domain, unit):
             np.arange(0, ds * ndx, int(ds)), np.arange(0, ds * ndy, int(ds))
         )
         ## stagger gird to fit on wrf_out
-        gridx, gridy = gridx - ds / 2, gridy - ds / 2
+        if stagger == True:
+            gridx, gridy = gridx - ds / 2, gridy - ds / 2
+            XLAT_name, XLONG_name = "XLAT", "XLONG"
+        elif stagger == False:
+            XLAT_name, XLONG_name = "s_XLAT", "s_XLONG"
+        else:
+            raise ValueError("Stagger must be True or False")
+
         ## drop first row/colum to match size
         gridx, gridy = gridx[1:, 1:], gridy[1:, 1:]
         # now adding a georefernce we have UTM grid (technically UTM_12N, or EPSG:26912
@@ -128,12 +135,12 @@ def makeLL_new(domain, unit):
         WGSx, WGSy = pyproj.transform(epsg26912, wgs84, UTMx.ravel(), UTMy.ravel())
         XLONG, XLAT = np.reshape(WGSx, np.shape(UTMx)), np.reshape(WGSy, np.shape(UTMy))
         XLAT = xr.DataArray(
-            name="XLAT",
+            name=XLAT_name,
             data=XLAT,
             dims=["south_north", "west_east"],
         )
         XLONG = xr.DataArray(
-            name="XLONG",
+            name=XLONG_name,
             data=XLONG,
             dims=["south_north", "west_east"],
         )

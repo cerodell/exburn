@@ -239,29 +239,29 @@ real = np.clip(plt.imread(filein) * factor, *clip_range)
 real = real[::-1, :, :]
 bm.imshow(real, zorder=1, extent=wesn)
 
-tr17_1 = fire_ds["GRNHFX"].isel(Time=1)
-contour = ax.contourf(
-    fire_XLONG,
-    fire_XLAT,
-    tr17_1,
-    zorder=1,
-    # transform=crs.PlateCarree(),
-    # cmap=cmap,
-    # norm=norm,
-    extend="max",  # cubehelix_r
-    alpha=0.6,
-)
+# tr17_1 = fire_ds["GRNHFX"].isel(Time=1)
+# contour = ax.contourf(
+#     fire_XLONG,
+#     fire_XLAT,
+#     tr17_1,
+#     zorder=1,
+#     # transform=crs.PlateCarree(),
+#     # cmap=cmap,
+#     # norm=norm,
+#     extend="max",  # cubehelix_r
+#     alpha=0.6,
+# )
 ax.set_xlim(fire_nsew[3] - 0.002, fire_nsew[2])
 ax.set_ylim(fire_nsew[1], fire_nsew[0])
 
 
-met_ds.tr17_1.plot(
-    col="Time",
-    col_wrap=4,
-    levels=levels,
-    cmap=cmap,
-    extend="max",
-)
+# met_ds.tr17_1.plot(
+#     col="Time",
+#     col_wrap=4,
+#     levels=levels,
+#     cmap=cmap,
+#     extend="max",
+# )
 
 
 # fire_ds = wrf_ds.sel(
