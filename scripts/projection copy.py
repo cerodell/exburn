@@ -16,7 +16,7 @@ from utils.sfire import makeLL_new
 
 from context import root_dir, data_dir, img_dir
 
-from wrf import getvar, interplevel
+from wrf import getvar, interplevel, destagger
 
 # define unit
 unit = "unit4"
@@ -24,71 +24,39 @@ unit = "unit4"
 # # Open the NetCDF file
 ncfile = Dataset(str(data_dir) + f"/{unit}/wrfout_d01_2019-05-11_17:49:11")
 
-uvmet = getvar(ncfile, "uvmet")
+# uvmet = getvar(ncfile, "uvmet", timeidx = ALL_TIMES)
+wrf_ds = xr.open_dataset(str(data_dir) + f"/{unit}/wrfout_d01_2019-05-11_17:49:11")
 ht = getvar(ncfile, "z", units="m")
+del ht["XTIME"]
+del ht["Time"]
+wrf_ds["height"] = ht
 
-uvmet6 = interplevel(uvmet, ht, 6)
-
-U6 = uvmet6.sel(u_v="u")
-V6 = uvmet6.sel(u_v="v")
-
-
-# gdal.UseExceptions()
-
-filein = str(root_dir) + "/sat/response.tiff"
-shapefile_in = str(data_dir) + "/all_units/mygeodata_merged"
-
-
-## Open COnfig File and Get Relevant Paramters
-with open(str(root_dir) + "/json/config-new.json") as f:
-    config = json.load(f)
-namelist = config[unit]["sfire"]
-
+wrf_ds["U"] = destagger(wrf_ds["U"], -1, True)
+wrf_ds["V"] = destagger(wrf_ds["V"], -2, True)
 
 XLAT, XLONG = makeLL_new("met", unit)
 s_XLAT, s_XLONG = makeLL_new("met", unit, stagger=False)
-
-
-# create dataframe with columns of all XLAT/XLONG
-wrf_locs = pd.DataFrame({"XLAT": XLAT.values.ravel(), "XLONG": XLONG.values.ravel()})
-wrf_tree = KDTree(wrf_locs)
-print("WRF Domain KDTree built")
-
-
-def get_loc(lat, lon):
-    dist, ind = wrf_tree.query(np.array([lat, lon]).reshape(1, -1), k=1)
-    loc = list(np.unravel_index(int(ind), XLAT.shape))
-    return loc
-
-
-met_nsew = namelist["met-nsew"]
-ll = get_loc(met_nsew[1], met_nsew[3])
-ur = get_loc(met_nsew[0], met_nsew[2])
-south_north_met = slice(ll[0], ur[0])
-west_east_met = slice(ll[1], ur[1])
-
-fire_nsew = namelist["fire-nsew"]
-ll = get_loc(fire_nsew[1], fire_nsew[3])
-ur = get_loc(fire_nsew[0], fire_nsew[2])
-south_north_fire = slice(ll[0] - 5, ur[0] + 5)
-west_east_fire = slice(ll[1] - 5, ur[1] + 5)
+wrf_ds["XLAT"], wrf_ds["XLONG"] = XLAT, XLONG
+wrf_ds["s_XLAT"], wrf_ds["s_XLONG"] = s_XLAT, s_XLONG
 
 south_north_fire = slice(76, 95, None)
 west_east_fire = slice(77, 92, None)
 
-## open wrf-sfire simulation
-wrf_ds = xr.open_dataset(str(data_dir) + f"/{unit}/wrfout_d01_2019-05-11_17:49:11")
-# wrf_ds[var] = wrf_ds[var] / pm_ef
-
-wrf_ds["XLAT"], wrf_ds["XLONG"] = XLAT, XLONG
-wrf_ds["s_XLAT"], wrf_ds["s_XLONG"] = s_XLAT, s_XLONG
-
-
-fire_ds = wrf_ds.sel(
+wrf_ds = wrf_ds.sel(
     south_north=south_north_fire,
     west_east=west_east_fire,
     Time=slice(0, 124, 6),
 )
+
+
+wrf_ds["U6"] = interplevel(wrf_ds["U"], wrf_ds["height"], 6)
+wrf_ds["V6"] = interplevel(wrf_ds["V"], wrf_ds["height"], 6)
+wrf_ds["wsp6"] = (wrf_ds["U6"] ** 2 + wrf_ds["V6"] ** 2) ** (0.5)
+
+
+# gdal.UseExceptions()
+filein = str(root_dir) + "/sat/response.tiff"
+shapefile_in = str(data_dir) + "/all_units/mygeodata_merged"
 
 
 # Read shape file
@@ -111,14 +79,10 @@ projection = ccrs.epsg(projcs)
 
 
 subplot_kw = dict(projection=projection)
-for i in range(len(fire_ds.XTIME)):
+for i in range(len(wrf_ds.XTIME)):
     fig, ax = plt.subplots(figsize=(9, 9), subplot_kw=subplot_kw)
-    ds_i = fire_ds.isel(Time=i)
+    ds_i = wrf_ds.isel(Time=i)
 
-    # a = np.arange(1, 10)
-    # b = 10 ** np.arange(4)
-    # levels = (b[:, np.newaxis] * a).flatten()
-    # levels = np.arange(5, 120, 5)
     levels = np.arange(0, 10, 0.5)
     # cmap = mpl.cm.YlOrRd
     cmap = mpl.cm.jet
@@ -147,11 +111,11 @@ for i in range(len(fire_ds.XTIME)):
         [fire_nsew[3], fire_nsew[2], fire_nsew[1], fire_nsew[0]], crs=ccrs.PlateCarree()
     )  ##  (x0, x1, y0, y1)
 
-    shape = fire_ds["s_XLONG"].shape
+    shape = ds_i["s_XLONG"].shape
     for i in range(shape[1]):
         ax.plot(
-            fire_ds["s_XLONG"][:, i],
-            fire_ds["s_XLAT"][:, i],
+            ds_i["s_XLONG"][:, i],
+            ds_i["s_XLAT"][:, i],
             color="tab:red",
             zorder=10,
             transform=ccrs.PlateCarree(),
@@ -160,8 +124,8 @@ for i in range(len(fire_ds.XTIME)):
 
     for i in range(shape[0]):
         ax.plot(
-            fire_ds["s_XLONG"][i, :],
-            fire_ds["s_XLAT"][i, :],
+            ds_i["s_XLONG"][i, :],
+            ds_i["s_XLAT"][i, :],
             color="tab:red",
             zorder=10,
             transform=ccrs.PlateCarree(),
@@ -169,38 +133,38 @@ for i in range(len(fire_ds.XTIME)):
         )
 
     ax.scatter(
-        fire_ds["XLONG"][1:, 1:],
-        fire_ds["XLAT"][1:, 1:],
+        ds_i["XLONG"][1:, 1:],
+        ds_i["XLAT"][1:, 1:],
         transform=ccrs.PlateCarree(),
         color="k",
         s=0.5,
         zorder=10,
     )
-    wsp = (ds_i["U10"] ** 2 + ds_i["V10"] ** 2) ** (0.5)
     # tr17_1= xr.where(tr17_1==0, np.nan, tr17_1)
 
     contour = ax.contourf(
-        fire_ds["XLONG"][1:, 1:],
-        fire_ds["XLAT"][1:, 1:],
-        wsp[1:, 1:],
+        ds_i["XLONG"][1:, 1:],
+        ds_i["XLAT"][1:, 1:],
+        ds_i["wsp6"][1:, 1:],
         zorder=1,
         transform=ccrs.PlateCarree(),
         levels=levels,
         cmap=cmap,
         norm=norm,
         extend="max",  # cubehelix_r
-        alpha=0.8,
+        alpha=0.6,
     )
     cbar = plt.colorbar(contour, ax=ax, pad=0.04, location="right")
     cbar.ax.tick_params(labelsize=10)
     cbar.set_label(
-        "Wind Speed  \n" + r"($\frac{\mathrm{m}}{\mathrm{~s}}$)",
+        "Wind Speed  " + r"($\frac{\mathrm{m}}{\mathrm{~s}}$)",
         rotation=270,
         fontsize=14,
-        labelpad=15,
+        labelpad=20,
     )
     ax.set_title(
-        f"Unit 4 Heat Flux \n at {str(ds_i.XTIME.values)[11:-10]}", fontsize=10
+        f"Unit 4 Wind Speed at 6 meters \n  {str(ds_i.XTIME.values)[11:-10]}",
+        fontsize=15,
     )
 
     plt.savefig(
