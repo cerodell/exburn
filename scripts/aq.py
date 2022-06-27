@@ -25,11 +25,11 @@ import matplotlib as mpl
 
 
 ##################### Define Inputs and File Directories ###################
-modelrun = "F6V51M08Z22"
+modelrun = "F6V51M08Z22FIRE"
 configid = "F6V51"
 domain = "met"
 var = "tr17_1"
-# var = 'fire_smoke'
+var = "fire_smoke"
 
 # pm_ef = 21.05  # boreal wildfire emission factor Urbanski (2014)
 pm_ef = 10.400

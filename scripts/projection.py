@@ -18,13 +18,15 @@ from context import root_dir, data_dir, img_dir
 
 from wrf import getvar, interplevel
 
-# define unit
+# define unit for creating the la/long grind and obtaning qucik slice info
 unit = "unit4"
 
 # # Open the NetCDF file
 ncfile = Dataset(str(data_dir) + f"/{unit}/wrfout_d01_2019-05-11_17:49:11")
 
+## et u and v met
 uvmet = getvar(ncfile, "uvmet")
+## get height
 ht = getvar(ncfile, "z", units="m")
 
 uvmet6 = interplevel(uvmet, ht, 6)
@@ -112,6 +114,7 @@ projection = ccrs.epsg(projcs)
 
 subplot_kw = dict(projection=projection)
 for i in range(len(fire_ds.XTIME)):
+
     fig, ax = plt.subplots(figsize=(9, 9), subplot_kw=subplot_kw)
     ds_i = fire_ds.isel(Time=i)
 

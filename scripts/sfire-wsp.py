@@ -1,5 +1,6 @@
 import context
-import wrf
+
+# import wrf
 import json
 import pickle
 import numpy as np
@@ -46,7 +47,7 @@ colors = [
 cmap = LinearSegmentedColormap.from_list("meteoblue", colors, N=len(levels))
 
 fireshape_path = str(data_dir) + "/unit_5/unit_5"
-flux_filein = str(data_dir) + "/obs/met/"
+met_filein = str(data_dir) + "/obs/met/"
 save_dir = Path(str(save_dir) + f"/{modelrun}/")
 save_dir.mkdir(parents=True, exist_ok=True)
 
@@ -114,7 +115,7 @@ XLAT, XLONG = wrf_ds.XLAT.values, wrf_ds.XLONG.values
 
 ## open 2d sonic tower data and kestral ops met data
 def prepare_df(i):
-    df = pd.read_csv(str(flux_filein) + f"{'south_met'}.csv")
+    df = pd.read_csv(str(met_filein) + f"{'south_met'}.csv")
     df["DateTime"] = pd.to_datetime(df["TIMESTAMP"], infer_datetime_format=True)
     df = df.set_index("DateTime")[str(times[0]) : str(times[-1])]
     return df

@@ -1,12 +1,16 @@
 import context
+import glob
 import dask
 import json
 import numpy as np
 import pandas as pd
 import xarray as xr
+import cartopy.crs as ccrs
 from pathlib import Path
 import pyproj as pyproj
 from datetime import datetime
+import cartopy.crs as ccrs
+
 from context import data_dir, root_dir
 import warnings
 
@@ -267,3 +271,102 @@ def makeLL(domain, modelrun):
     else:
         raise ValueError("Invalid domain option")
     return XLAT, XLONG
+
+
+def prepare_df(rosin, ros_filein, times):
+    headers = ["day", "hour", "minute", "second", "temp"]
+    df = pd.read_csv(
+        glob.glob(ros_filein + f"{rosin}*.txt")[0],
+        sep="\t",
+        index_col=False,
+        skiprows=16,
+        names=headers,
+    )
+    df["year"], df["month"] = "2019", "05"
+    df = df[:-1]
+    df["DateTime"] = pd.to_datetime(
+        df[["year", "month"] + headers[:-1]], infer_datetime_format=True
+    )
+    df.drop(["year", "month"] + headers[:-1], axis=1, inplace=True)
+    df = df.set_index("DateTime")
+    df = df[~df.index.duplicated(keep="first")]
+    upsampled = df.resample("1S")
+    df = upsampled.interpolate(method="linear")
+    df = df[str(times[0]) : str(times[-1])]
+    df["DateTime"] = pd.to_datetime(df.index)
+    return df
+
+
+def ignition_line(modelrun, ax, ig_start, ig_end):
+    if ("I04" in modelrun) == True:
+        print("Multi line ignition")
+        ignite(
+            ax,
+            ig_start=[55.7177529, -113.5713107],
+            ig_end=[55.71773480, -113.57183453],
+            line="1",
+            color="tab:red",
+        )
+        ignite(
+            ax,
+            ig_start=[55.7177109, -113.5721005],
+            ig_end=[55.7177124, -113.5725656],
+            line="2",
+            color="tab:blue",
+        )
+        ignite(
+            ax,
+            ig_start=[55.7177293, -113.5734885],
+            ig_end=[55.7177437, -113.5744894],
+            line="3",
+            color="tab:green",
+        )
+        ignite(
+            ax,
+            ig_start=[55.7177775603, -113.5747705233],
+            ig_end=[55.717752429, -113.575192125],
+            line="4",
+            color="tab:grey",
+        )
+    else:
+        print("Single line ignition")
+        ignite(ax, ig_start, ig_end, line="1", color="tab:red")
+
+
+def ignite(ax, ig_start, ig_end, line, color):
+    ax.scatter(
+        ig_start[1],
+        ig_start[0],
+        c=color,
+        s=200,
+        marker="*",
+        # alpha=0.6,
+        label=f"{line} ignition start",
+        zorder=10,
+        edgecolors="black",
+        transform=ccrs.PlateCarree(),
+    )
+    ax.scatter(
+        ig_end[1],
+        ig_end[0],
+        c=color,
+        marker="X",
+        s=150,
+        # alpha=0.6,
+        label=f"{line} ignition end",
+        zorder=10,
+        edgecolors="black",
+        transform=ccrs.PlateCarree(),
+    )
+    ax.plot(
+        [ig_start[1], ig_end[1]],
+        [ig_start[0], ig_end[0]],
+        linestyle="--",
+        lw=2,
+        marker="",
+        zorder=9,
+        color="k",
+        transform=ccrs.PlateCarree(),
+        # alpha=0.6,
+    )
+    return
